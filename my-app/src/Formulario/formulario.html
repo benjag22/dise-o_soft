@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="formularioCSS.css">
+    <title>Formulario Registro</title>
+</head>
+<body>
+    <section class="form-register">
+        <div class="div_remitente">
+            <h4>Datos Remitente</h4>
+            <input class="controls" type="text" name="remitente" id="Nombre" placeholder="Ingrese su nombre">
+            <input class="controls" type="text" name="correo" id="Correo" placeholder="Ingrese su correo">
+            <input class="controls" type="text" name="rut" id="Rut" placeholder="Ingrese su Rut">
+            <input class="controls" type="text" name="direccion_de_recogida" id="Direccion de recogida" placeholder="Direccion de recogida">
+        </div>
+        <div class="div_destinatario">
+            <h4>Datos del destinatario</h4>
+            <input class="controls" type="text" name="destinatario" id="Destinatario" placeholder="Ingrese nombre">
+            <input class="controls" type="text" name="rut_destinatario" id="Rut" placeholder="Ingrese rut">
+            <input class="controls" type="text" name="fono" id="fono" placeholder="Numero de telefono">
+        </div>
+        <div class="div_datos_envio">
+            <h4>Datos de envio</h4>
+            <input class="controls" type="text" name="direccion_envio" id="Direccion de envio" placeholder="Ingrese la direccion">
+            <input class="controls" type="text" name="ciudad" id="Ciudad" placeholder="Ingrese ciudad">
+            <input class="controls" type="text" name="codigo postal" id="Codigo postal" placeholder="Ingrese codigo postal">
+            <label class="etiquetas" for="tipo entrega">Tipo de entrega</label>
+            <select name="tipo entrega" class="controls">
+                <option disabled="">Selecciona una opción</option>
+                <option value="entrega en el dia">Entrega en el día</option>
+                <option value="entrega rápida">Entrega rápida</option>
+                <option value="entrega normal">Entrega normal</option>
+            </select>
+            <label class="etiquetas" for="tipo paquete">Tipo de paquete</label>
+            <select name="tipo paquete" class="controls">
+                <option disabled="">Selecciona una opción</option>
+                <option value="sobre">Sobre</option>
+                <option value="encomienda">Encomienda</option>
+            </select>
+            <label class="etiquetas" for="quien paga">Pagado por</label>
+            <select name="quien paga" class="controls">
+                <option disabled="">Selecciona una opción</option>
+                <option value="envio pagado">Remitente</option>
+                <option value="envio por pagar">Destinatario</option>
+            </select>
+        </div>
+        <button id="botonVolver" class="botons" type="submit" value="Volver">Volver</button>
+        <button class="botons" type="submit" value="Registrar">Registrar</button>
+    </section>
+</body>
+</html>
