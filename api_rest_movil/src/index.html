@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Envío por Pagar</title>
+</head>
+<body>
+    <h1>Verificación de Envío por Pagar</h1>
+    <div id="envio-info">
+        <!-- Aquí se llenará dinámicamente la información del envío -->
+    </div>
+    <button onclick="verificarRut()">Verificar Rut</button>
+
+    <script>
+        function verificarRut() {
+            fetch("/envios/por_pagar")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const envio = data[0];
+                        const envioInfo = document.getElementById("envio-info");
+                        envioInfo.innerHTML = `
+                            <p>Remitente: ${envio.Remitente}</p>
+                            <p>Destinatario: ${envio.Destinatario}</p>
+                            <p>Rut Destinatario: ${envio.Rut_Destinatario}</p>
+                            <p>Dirección de Envío: ${envio.Direccion_envio}</p>
+                            <p>Ciudad: ${envio.Ciudad}</p>
+                            <p>Tipo de Envío: ${envio.Tipo_de_envio}</p>
+                        `;
+                    } else {
+                        alert("No hay envíos por pagar.");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function eliminarEnvio() {
+            const rut = document.getElementById("rut").value;
+            fetch(`/verificar_rut/${rut}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.estado_solicitud === "Exitosa") {
+                        fetch(`/envios/${rut}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message);
+                            // Limpiar la información del envío
+                            document.getElementById("envio-info").innerHTML = "";
+                        })
+                        .catch(error => console.error('Error:', error));
+                    } else {
+                        alert("El Rut no se verificó correctamente.");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
