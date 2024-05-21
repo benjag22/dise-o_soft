@@ -9,7 +9,7 @@ body {
 }
 
 .form-register {
-    width: 900px;
+    width: 900;
     background: #24303c;
     padding: 30px;
     margin: 100px auto;
@@ -42,9 +42,18 @@ select {
     font-family: 'calibri';
     font-size: 18px;
 }
-.div_destinatario,
-.div_remitente {
+#div_destinatario,
+#div_remitente {
     display: flex;
     flex-direction: column;
-    width: 50%
+    width: 35%
+}
+.info_campo{
+    font-size: large;
+}
+
+.pasar_pagina{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
 }
