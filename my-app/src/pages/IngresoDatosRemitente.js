@@ -14,21 +14,23 @@ export function IngresoDatosRemitente() {
             <section className="form-register" id="div_remitente">
 
                 <h4>Datos Remitente</h4>
-                <label className="info_campo">Nombre completo</label>
+                <label className="info_campo" htmlFor="nombre">Nombre completo</label>
                 <input
                     className="controls"
                     type="text"
                     value={Remitente}
                     placeholder="Ingrese su nombre"
                     onChange={(e) => setRemitente(e.target.value)}
+                    id="nombre"
                 />
-                <label className="info_campo">Correo electronico</label>
+                <label className="info_campo" htmlFor="correo">Correo electronico</label>
                 <input
                     className="controls"
                     type="email"
                     value={Correo}
                     placeholder="Ingrese su correo"
                     onChange={(e) => setEmail(e.target.value)}
+                    id="correo"
                 />
                 <label className="info_campo" htmlFor="direccionRecogida">
                     Recogida a domicilio
@@ -57,9 +59,9 @@ export function IngresoDatosRemitente() {
                     <button href= "/envios"className="buttons" type="submit" value="Registrar">
                         Volver
                     </button>
-                    <button href= "/envios"className="buttons" type="submit" value="Registrar">
+                    <a href= "#/IngresoDatosDestinatario"className="buttons" type="submit" value="Registrar">
                         Siguiente
-                    </button>
+                    </a>
                 </div>
 
             </section>
