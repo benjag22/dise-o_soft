@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import "../Formulario/formularioCSS.css";
 import "../Formulario/ButtonStyle.css";
+import { BotonNavegar } from "../components/BotonNavegar";
+import { useNavigate } from 'react-router-dom';
+
+
 
 export function IngresoDatosDestinatario() {
     const [Destinatario, setDestinatario] = useState("");
@@ -9,9 +13,15 @@ export function IngresoDatosDestinatario() {
     const [Fono, setFono] = useState("");
     const [Reparto_a_domicilio, setReparto_a_domicilio] = useState(false);
 
-  
+
+    const navigate = useNavigate();
+
+    const redirectToPage = () => {
+        navigate('/IngresoDatosDeEnvio');
+    };
+
     return (
-        <form className="form-register" id="div_envio">
+        <form className="form-register" id="div_envio" onSubmit={redirectToPage}>
             <h4>Datos del destinatario</h4>
             <label className="info_campo" htmlFor="nombre_destinatario">Nombre destinatario</label>
             <input
@@ -21,6 +31,7 @@ export function IngresoDatosDestinatario() {
                 placeholder="Ingrese nombre del destinatario"
                 onChange={(e) => setDestinatario(e.target.value)}
                 id="nombre_destinatario"
+                required
             />
             <label className="info_campo" htmlFor="rut_destinatario">R.U.T</label>
             <input
@@ -30,6 +41,7 @@ export function IngresoDatosDestinatario() {
                 placeholder="Ingrese Rut"
                 onChange={(e) => setRut_Destinatario(e.target.value)}
                 id="rut_destinatario"
+                required
             />
             <label className="info_campo" htmlFor="fono_remitente">Telefóno</label>
             <input
@@ -39,6 +51,7 @@ export function IngresoDatosDestinatario() {
                 placeholder="Numero de telefono"
                 onChange={(e) => setFono(e.target.value)}
                 id="fono_remitente"
+                required
             />
             <label className="Info_campo" htmlFor="direccionRecogida">
                 Reparto a domicilio
@@ -55,14 +68,7 @@ export function IngresoDatosDestinatario() {
                 <option value="false">No</option>
             </select>
             
-            <div className="pasar_pagina">
-                <a href= "#/IngresoDatosRemitente"className="buttons" type="submit" value="Registrar">
-                    Volver
-                </a>
-                <a href= "#/IngresoDatosDeEnvio"className="buttons" type="submit" value="Registrar">
-                    Siguiente
-                </a>
-            </div>
+            <BotonNavegar paginaAntes="/IngresoDatosRemitente"/>
             
 
         </form>

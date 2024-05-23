@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { useNavigate } from 'react-router-dom';
 import "../Formulario/formularioCSS.css";
 import "../Formulario/ButtonStyle.css";
+import { BotonNavegar } from "../components/BotonNavegar"
 
 export function DatosEnvio() {
+
+    //Definicion useStates
     const [Fecha_de_recepcion, setFecha_de_recepcion] = useState("");
     const [Ciudad, setCiudad] = useState("");
     const [Codigo_postal, setCodigo_postal] = useState("");
@@ -14,8 +18,17 @@ export function DatosEnvio() {
     const [Tipo_de_envio, setTipo_de_envio] = useState("");
     const [Peso, setPeso] = useState(0.0);
     const [Reparto_a_domicilio, setReparto_a_domicilio] = useState(false);
+
+
+    const navigate = useNavigate();
+    //funciones varias para el jsx
+
+    const redirectToPage = () => {
+        navigate('/IngresoDatosRemitente');
+    };
+
     return (
-        <form className="form-register" id="div_envio">
+        <form className="form-register" id="div_envio" onSubmit={redirectToPage}>
             <h4>Datos de envio</h4>
             <label className="info_campo">Direccion</label>
             <input
@@ -24,6 +37,7 @@ export function DatosEnvio() {
                 value={Direccion_envio}
                 placeholder="Ingrese la direccion"
                 onChange={(e) => setDireccion_envio(e.target.value)}
+                required
             />
             
             <label className="info_campo">Ciudad</label>
@@ -34,6 +48,7 @@ export function DatosEnvio() {
                 value={Ciudad}
                 placeholder="Ingrese ciudad"
                 onChange={(e) => setCiudad(e.target.value)}
+                required
             />
             <label className="info_campo">Código postal</label>
 
@@ -43,6 +58,7 @@ export function DatosEnvio() {
                 value={Codigo_postal}
                 placeholder="Ingrese codigo postal"
                 onChange={(e) => setCodigo_postal(e.target.value)}
+                required
             />
             <label className="info_campo" htmlFor="tipo_entrega">
                 Tipo de entrega
@@ -104,14 +120,7 @@ export function DatosEnvio() {
                 <option value="true">Destinatario</option>
             </select>
 
-            <div className="pasar_pagina">
-                <a href= "#/IngresoDatosDestinatario"className="buttons" type="submit" value="Registrar">
-                    Volver
-                </a>
-                <a href= "#/envio"className="buttons" type="submit" value="Registrar">
-                    Enviar
-                </a>
-            </div>
+            <BotonNavegar paginaAntes="/IngresoDatosDestinatario"/>
 
         </form>
     )
