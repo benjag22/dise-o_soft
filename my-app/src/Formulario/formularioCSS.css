@@ -43,7 +43,8 @@ select {
     font-size: 18px;
 }
 #div_destinatario,
-#div_remitente {
+#div_remitente, 
+#div_envio {
     display: flex;
     flex-direction: column;
     width: 35%

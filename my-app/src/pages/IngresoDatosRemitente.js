@@ -10,43 +10,43 @@ export function IngresoDatosRemitente() {
     const [Direccion_remitente, setDireccion_recogida] = useState("");
 
     return (
-        <form>
-            <section className="form-register" id="div_remitente">
-
-                <h4>Datos Remitente</h4>
-                <label className="info_campo" htmlFor="nombre">Nombre completo</label>
-                <input
-                    className="controls"
-                    type="text"
-                    value={Remitente}
-                    placeholder="Ingrese su nombre"
-                    onChange={(e) => setRemitente(e.target.value)}
-                    id="nombre"
-                />
-                <label className="info_campo" htmlFor="correo">Correo electronico</label>
-                <input
-                    className="controls"
-                    type="email"
-                    value={Correo}
-                    placeholder="Ingrese su correo"
-                    onChange={(e) => setEmail(e.target.value)}
-                    id="correo"
-                />
-                <label className="info_campo" htmlFor="direccionRecogida">
-                    Recogida a domicilio
-                </label>
-                <select
-                    className="controls"
-                    value={Recogida_a_domicilio}
-                    onChange={(e) => setRecogidaADomicilio(e.target.value === "true")}
-                >
-                    <option disabled value="">
-                    Seleccione una opción
-                    </option>
-                    <option value="true">Sí</option>
-                    <option value="false">No</option>
-                </select>
-                {Recogida_a_domicilio === true && (
+        <form className="form-register" id="div_remitente">
+            <h4>Datos Remitente</h4>
+            <label className="info_campo" htmlFor="nombre">Nombre completo</label>
+            <input
+                className="controls"
+                type="text"
+                value={Remitente}
+                placeholder="Ingrese su nombre"
+                onChange={(e) => setRemitente(e.target.value)}
+                id="nombre"
+            />
+            <label className="info_campo" htmlFor="correo">Correo electronico</label>
+            <input
+                className="controls"
+                type="email"
+                value={Correo}
+                placeholder="Ingrese su correo"
+                onChange={(e) => setEmail(e.target.value)}
+                id="correo"
+            />
+            <label className="info_campo" htmlFor="direccionRecogida">
+                Recogida a domicilio
+            </label>
+            <select
+                className="controls"
+                value={Recogida_a_domicilio}
+                onChange={(e) => setRecogidaADomicilio(e.target.value === "true")}
+            >
+                <option disabled value="">
+                Seleccione una opción
+                </option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+            {Recogida_a_domicilio === true && (
+                <div>
+                    <label>Direccion Recogida</label>
                     <input
                     className="controls"
                     type="text"
@@ -54,17 +54,16 @@ export function IngresoDatosRemitente() {
                     placeholder="Ingrese su dirección de recogida"
                     onChange={(e) => setDireccion_recogida(e.target.value)}
                     />
-                )}
-                <div className="pasar_pagina">
-                    <button href= "/envios"className="buttons" type="submit" value="Registrar">
-                        Volver
-                    </button>
-                    <a href= "#/IngresoDatosDestinatario"className="buttons" type="submit" value="Registrar">
-                        Siguiente
-                    </a>
                 </div>
-
-            </section>
+            )}
+            <div className="pasar_pagina">
+                <button href= "/envios"className="buttons" type="submit" value="Registrar">
+                    Volver
+                </button>
+                <a href= "#/IngresoDatosDestinatario"className="buttons" type="submit" value="Registrar">
+                    Siguiente
+                </a>
+            </div>
         </form>
     )
 }
