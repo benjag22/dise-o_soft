@@ -23,13 +23,12 @@ export function IngresoDatosDestinatario() {
 
             navigate('/IngresoDatosDeEnvio');
         }else{
-            console.log("ingrese bien");
+
         }
     };
 
     return (
         <form className="form-register" id="div_envio" onSubmit={redirectToPage}>
-            <BotonError mensaje=""></BotonError>
             <h4>Datos del destinatario</h4>
             <label className="info_campo" htmlFor="nombre_destinatario">Nombre destinatario</label>
             <input
@@ -76,6 +75,7 @@ export function IngresoDatosDestinatario() {
                 <option value="false">No</option>
             </select>
             
+            <BotonError mensaje="hola mundo"></BotonError>
             <BotonNavegar paginaAntes="/IngresoDatosRemitente"/>
             
 

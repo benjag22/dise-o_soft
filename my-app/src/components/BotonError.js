@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useNavigate } from 'react-router-dom';
 import "../Formulario/ButtonStyle.css";
+import "./BotonError.css";
 
 export function BotonError({mensaje=""}) {
 
@@ -11,8 +12,8 @@ export function BotonError({mensaje=""}) {
 
     return (
             
-        <div className="pasar_pagina">
-            algo raro
+        <div className="error">
+            {mensaje}
         </div>
 
     )
