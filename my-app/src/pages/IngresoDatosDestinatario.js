@@ -4,6 +4,7 @@ import "../Formulario/formularioCSS.css";
 import "../Formulario/ButtonStyle.css";
 import { BotonNavegar } from "../components/BotonNavegar";
 import { useNavigate } from 'react-router-dom';
+import { BotonError } from "../components/BotonError";
 
 
 
@@ -17,11 +18,18 @@ export function IngresoDatosDestinatario() {
     const navigate = useNavigate();
 
     const redirectToPage = () => {
-        navigate('/IngresoDatosDeEnvio');
+        const regex = /^(\d{1,2}(?:[\.]?\d{3}){2}-[\dkK])$/;
+        if (regex.test(Rut_Destinatario)){
+
+            navigate('/IngresoDatosDeEnvio');
+        }else{
+            console.log("ingrese bien");
+        }
     };
 
     return (
         <form className="form-register" id="div_envio" onSubmit={redirectToPage}>
+            <BotonError mensaje=""></BotonError>
             <h4>Datos del destinatario</h4>
             <label className="info_campo" htmlFor="nombre_destinatario">Nombre destinatario</label>
             <input
