@@ -14,22 +14,22 @@ class Envio(db.Model):
     __tablename__ = 'envios'
 
     id = db.Column(db.Integer, primary_key=True)
-    Remitente = db.Column(db.String(50))
-    Destinatario = db.Column(db.String(50))
-    Fono = db.Column(db.String(50))
-    Direccion_envio = db.Column(db.String(120))
-    Ciudad = db.Column(db.String(50))
-    Tipo_de_envio = db.Column(db.String(50))
-    Correo = db.Column(db.String(50))
-    Por_pagar = db.Column(db.Boolean)
-    Fecha_de_recepcion = db.Column(db.String(50))
-    Codigo_postal = db.Column(db.String(50))
-    Es_sobre = db.Column(db.Boolean)
-    Peso = db.Column(db.Float)
-    Recogida_a_domicilio = db.Column(db.Boolean)
-    Direccion_remitente = db.Column(db.String(120))
-    Reparto_a_domicilio = db.Column(db.Boolean)
-    Rut_Destinatario = db.Column(db.String(10))
+    remitente = db.Column(db.String(50))
+    destinatario = db.Column(db.String(50))
+    fono = db.Column(db.String(50))
+    direccionEnvio = db.Column(db.String(120))
+    ciudad = db.Column(db.String(50))
+    tipoEnvio = db.Column(db.String(50))
+    correo = db.Column(db.String(50))
+    porPagar = db.Column(db.Boolean)
+    fechaRecepcion = db.Column(db.String(50))
+    codigoPostal = db.Column(db.String(50))
+    esSobre = db.Column(db.Boolean)
+    peso = db.Column(db.Float)
+    recogidaADomicilio = db.Column(db.Boolean)
+    direccionRemitente = db.Column(db.String(120))
+    repartoADomicilio = db.Column(db.Boolean)
+    rutDestinatario = db.Column(db.String(10))
     pagado = db.Column(db.Boolean, default=False)
     entregado = db.Column(db.Boolean, default=False)
 
@@ -43,22 +43,22 @@ def submit():
         data = request.json
         if data:
             envio = Envio(
-                Remitente=data.get('Remitente'),
-                Destinatario=data.get('Destinatario'),
-                Fono=data.get('Fono'),
-                Direccion_envio=data.get('Direccion_envio'),
-                Ciudad=data.get('Ciudad'),
-                Tipo_de_envio=data.get('Tipo_de_envio'),
-                Correo=data.get('Correo'),
-                Por_pagar=data.get('Por_pagar'),
-                Fecha_de_recepcion=data.get('Fecha_de_recepcion'),
-                Codigo_postal=data.get('Codigo_postal'),
-                Es_sobre=data.get('Es_sobre'),
-                Peso=data.get('Peso'),
-                Recogida_a_domicilio=data.get('Recogida_a_domicilio'),
-                Direccion_remitente=data.get('Direccion_remitente'),
-                Reparto_a_domicilio=data.get('Reparto_a_domicilio'),
-                Rut_Destinatario = data.get('Rut_Destinatario'),
+                remitente=data.get('remitente'),
+                destinatario=data.get('destinatario'),
+                fono=data.get('fono'),
+                direccionEnvio=data.get('direccionEnvio'),
+                ciudad=data.get('ciudad'),
+                tipoEnvio=data.get('tipoEnvio'),
+                correo=data.get('correo'),
+                porPagar=data.get('porPagar'),
+                fechaRecepcion=data.get('fechaRecepcion'),
+                codigoPostal=data.get('codigoPostal'),
+                esSobre=data.get('esSobre'),
+                peso=data.get('peso'),
+                recogidaADomicilio=data.get('recogidaADomicilio'),
+                direccionRemitente=data.get('direccionRemitente'),
+                repartoADomicilio=data.get('repartoADomicilio'),
+                rutDestinatario = data.get('rutDestinatario'),
                 pagado = data.get('pagado'),
                 entregado = data.get('entregado')
             )
