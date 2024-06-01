@@ -10,7 +10,7 @@ function App() {
     return (
       <Router>
         <Routes>
-          <Route path='/' element={<Formulario/>}/>
+          <Route path='/' element={<EnviosComponent/>}/>
           <Route path='/IngresoDatosRemitente' element={<IngresoDatosRemitente/>}/>
           <Route path='/IngresoDatosDestinatario' element={<IngresoDatosDestinatario/>}/>
           <Route path='/IngresoDatosDeEnvio' element={<DatosEnvio/>}/>

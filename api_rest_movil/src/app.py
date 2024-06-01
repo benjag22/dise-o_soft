@@ -20,35 +20,35 @@ class Envio(db.Model):
     __tablename__ = 'envios'
 
     id = db.Column(db.Integer, primary_key=True)
-    Remitente = db.Column(db.String(50))
-    Destinatario = db.Column(db.String(50))
-    Fono = db.Column(db.String(50))
-    Direccion_envio = db.Column(db.String(120))
-    Ciudad = db.Column(db.String(50))
-    Tipo_de_envio = db.Column(db.String(50))
-    Correo = db.Column(db.String(50))
-    Por_pagar = db.Column(db.Boolean)
-    Fecha_de_recepcion = db.Column(db.String(50))
-    Codigo_postal = db.Column(db.String(50))
-    Es_sobre = db.Column(db.Boolean)
-    Peso = db.Column(db.Float)
-    Recogida_a_domicilio = db.Column(db.Boolean)
-    Direccion_remitente = db.Column(db.String(120))
-    Reparto_a_domicilio = db.Column(db.Boolean)
-    Rut_Destinatario = db.Column(db.String(10))
+    remitente = db.Column(db.String(50))
+    destinatario = db.Column(db.String(50))
+    fono = db.Column(db.String(50))
+    direccionEnvio = db.Column(db.String(120))
+    ciudad = db.Column(db.String(50))
+    tipoEnvio = db.Column(db.String(50))
+    correo = db.Column(db.String(50))
+    porPagar = db.Column(db.Boolean)
+    fechaRecepcion = db.Column(db.String(50))
+    codigoPostal = db.Column(db.String(50))
+    esSobre = db.Column(db.Boolean)
+    peso = db.Column(db.Float)
+    recogidaADomicilio = db.Column(db.Boolean)
+    direccionRemitente = db.Column(db.String(120))
+    repartoADomicilio = db.Column(db.Boolean)
+    rutDestinatario = db.Column(db.String(10))
     pagado = db.Column(db.Boolean, default=False)
     entregado = db.Column(db.Boolean, default=False)
-    
 
 with app.app_context():
-    db.create_all()  
+    db.create_all()   
+
      
 def ping():
     return jsonify({'status': 'ok'})
 
 
 def obtener_estado_solicitud_desde_bd(id, rut):
-    envio = Envio.query.filter_by(id=id, Rut_Destinatario=rut).first()
+    envio = Envio.query.filter_by(id=id, rutDestinatario=rut).first()
     if envio:
         return True
     else:
@@ -75,29 +75,29 @@ def validar_rut(id, rut, url):
 
 @app.route("/verificar_rut/<int:id>/<string:rut>", methods=["GET"])
 def verificarRut(id, rut):
-    #url = request.url //para despues cuando sea global
     return validar_rut(id, rut, "https://portal.sidiv.registrocivil.cl/usuarios-portal/pages/DocumentRequestStatus.xhtml?RUN=21390811-1&type=CEDULA&serial=529885698")
 
 
 @app.route("/envios/por_pagar", methods=["GET"])
 def obtener_primer_envio_por_pagar():
-    envios: list[Envio] = list(Envio.query.filter_by(Por_pagar=True).all())
-    for i in range(len(envios)):
-        json = envios[i].__dict__
-        del json["_sa_instance_state"]
-        envios[i] = json
-    return jsonify(envios)
+    envios = Envio.query.filter_by(porPagar=True).all()
+    envios_list = []
+    for envio in envios:
+        envio_dict = envio.__dict__
+        del envio_dict["_sa_instance_state"]
+        envios_list.append(envio_dict)
+    return jsonify(envios_list)
 
-def enviarCorreo(Correo, id,Destinatario):
+def enviarCorreo(correo, id, destinatario):
     user = "benjagonzalez2022@inf.udec.cl"
     passw = "marfbgodlybswhhb"
-    destinatario = Correo
+    destinatario_correo = correo
     asunto = "Pedido"+  str(id)
-    mensaje = "Estimado/a cliente,\n\nSu envio con el ID " + str(id) + " dirigido a "+ Destinatario +", a sido entregado correctamente.\n\nGracias por su preferencia"
+    mensaje = "Estimado/a cliente,\n\nSu envio con el ID " + str(id) + " dirigido a "+ destinatario +", a sido entregado correctamente.\n\nGracias por su preferencia"
     
     msg = MIMEMultipart()
     msg['From'] = user
-    msg['To'] = destinatario
+    msg['To'] = destinatario_correo
     msg['Subject'] = asunto
     msg.attach(MIMEText(mensaje, 'plain'))
 
@@ -106,15 +106,15 @@ def enviarCorreo(Correo, id,Destinatario):
         server.starttls()
         server.login(user, passw)
         text = msg.as_string()
-        server.sendmail(user, destinatario, text)
-        print("1")
+        server.sendmail(user, destinatario_correo, text)
+        print("Correo enviado correctamente")
         server.quit()
     except Exception as e:
         print("0")
 
 
-@app.route("/entregarEnvio/<int:id>/<string:Correo>/<string:Destinatario>", methods=["PATCH"])
-def modificarEnvio(id, Correo, Destinatario):
+@app.route("/entregarEnvio/<int:id>/<string:correo>/<string:destinatario>", methods=["PATCH"])
+def modificarEnvio(id, correo, destinatario):
     data = request.json
 
     envio = Envio.query.get(id)
@@ -122,7 +122,7 @@ def modificarEnvio(id, Correo, Destinatario):
         if 'entregado' in data:
             envio.entregado = data['entregado']
         db.session.commit()
-        enviarCorreo(Correo, id, Destinatario)
+        enviarCorreo(correo, id, destinatario)
         return jsonify({"message": "Envío modificado y correo enviado correctamente"}), 200
     else:
         return jsonify({"error": "Envío no encontrado"}), 404

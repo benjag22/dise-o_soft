@@ -1,4 +1,3 @@
-
 export const GetEnvios = async () => {
   try {
     const res = await fetch("http://127.0.0.1:4000/envios/por_pagar");
@@ -6,7 +5,7 @@ export const GetEnvios = async () => {
       throw new Error("Error al obtener los envíos");
     }
     const dataJson = await res.json();
-    return dataJson;
+    return dataJson.map((envio) => ({ ...envio, id: envio.id }));
   } catch (error) {
     console.error("Error en la solicitud de envíos:", error);
     return []; 
