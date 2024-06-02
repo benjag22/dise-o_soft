@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { GetEnvios } from "./GetEnvios";
 import "./EnviosComponentStyles.css";
-import DetallesEnvio from "./DetallesEnvio";
+
 
 const EnviosComponent = () => {
   const [envios, setEnvios] = useState([]);
@@ -14,6 +15,11 @@ const EnviosComponent = () => {
 
     fetchEnvios();
   }, []);
+  const navigate = useNavigate();
+
+  const handleDetailClick = (envioId) => {
+    navigate(`/detalle-envio/${envioId}`);
+  }
 
   return (
     <div className="envios-container">
@@ -27,10 +33,9 @@ const EnviosComponent = () => {
               <p><strong>Destino:</strong> {envio.ciudad}</p>
             </div>
             <div className="detalles-envio">
-              <button className="detalles-button">
+              <button className="detalles-button" onClick={() => handleDetailClick(envio.id)}>
                 Detalles
               </button>
-              <DetallesEnvio envio={envio} />
             </div>
           </li>
         ))}

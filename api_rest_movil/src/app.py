@@ -127,5 +127,34 @@ def modificarEnvio(id, correo, destinatario):
     else:
         return jsonify({"error": "Envío no encontrado"}), 404
 
+@app.route("/detalle_envio/<int:id>", methods=["GET"])
+def detalles_envio(id):
+    envio = Envio.query.filter_by(id=id).first()
+    if envio is None:
+        return jsonify({"error": "Envio no encontrado"}), 404
+
+    envio_data = {
+        "id": envio.id,
+        "remitente": envio.remitente,
+        "destinatario": envio.destinatario,
+        "fono": envio.fono,
+        "direccionEnvio": envio.direccionEnvio,
+        "ciudad": envio.ciudad,
+        "tipoEnvio": envio.tipoEnvio,
+        "correo": envio.correo,
+        "porPagar": envio.porPagar,
+        "fechaRecepcion": envio.fechaRecepcion,
+        "codigoPostal": envio.codigoPostal,
+        "esSobre": envio.esSobre,
+        "peso": envio.peso,
+        "recogidaADomicilio": envio.recogidaADomicilio,
+        "direccionRemitente": envio.direccionRemitente,
+        "repartoADomicilio": envio.repartoADomicilio,
+        "rutDestinatario": envio.rutDestinatario,
+        "pagado": envio.pagado,
+        "entregado": envio.entregado
+    }
+    return jsonify(envio_data)
+
 if __name__ == '__main__':
     app.run(debug=True, port=4000)

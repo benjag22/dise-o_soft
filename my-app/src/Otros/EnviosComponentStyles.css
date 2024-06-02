@@ -12,7 +12,7 @@ h1 {
   text-align: center;
   color: #15b6c4;
   margin-bottom: 20px;
-  font-size: 2em; /* Tamaño de fuente mayor */
+  font-size: 2em; 
   font-weight: bold;
 }
 
@@ -26,16 +26,16 @@ ul {
   justify-content: space-between;
   align-items: center;
   border: 1px solid #ddd;
-  border-radius: 10px; /* Bordes más redondeados */
-  padding: 20px; /* Padding mayor para más espacio */
-  margin-bottom: 15px; /* Margen mayor entre elementos */
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 15px;
   background-color: #fff;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
-  transition: transform 0.2s; /* Transición suave */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
 }
 
 .envio-item:hover {
-  transform: translateY(-5px); /* Efecto hover */
+  transform: translateY(-5px);
 }
 
 .envio-info p {
@@ -58,7 +58,7 @@ ul {
   cursor: pointer;
   font-size: 2em;
   text-decoration: none;
-  transition: background-color 0.3s, transform 0.2s; /* Transición suave */
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .detalles-button a {
@@ -68,5 +68,5 @@ ul {
 
 .detalles-button:hover {
   background-color: #2980b9;
-  transform: scale(1.05); /* Efecto hover */
+  transform: scale(1.05); 
 }
