@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { format } from "date-fns";
 import { useNavigate } from 'react-router-dom';
 import "../Formulario/ButtonStyle.css";
 
-export function BotonNavegar({paginaAntes="/"}) {
+export function BotonNavegar({paginaAntes="/"},{botonSiguienteTexto="Siguiente"}) {
 
     const navigate = useNavigate();
     //funciones varias para el jsx
     const volverAtras = () => {
         navigate(paginaAntes);
     }
-
-
     return (
             
         <div className="pasar_pagina">
@@ -19,7 +16,7 @@ export function BotonNavegar({paginaAntes="/"}) {
                 Volver
             </button>
             <button type="submit" className="buttons" value="Registrar">
-                Enviar
+            {botonSiguienteTexto}
             </button>
         </div>
 

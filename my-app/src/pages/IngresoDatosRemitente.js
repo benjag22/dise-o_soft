@@ -67,7 +67,7 @@ export function IngresoDatosRemitente() {
                     />
                 </div>
             )}
-            <BotonNavegar/>
+            <BotonNavegar paginaAntes="/" botonsiguientetexto="siguiente"/>
         </form>
     )
 }
