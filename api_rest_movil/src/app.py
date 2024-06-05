@@ -38,14 +38,13 @@ class Envio(db.Model):
     rutDestinatario = db.Column(db.String(10))
     pagado = db.Column(db.Boolean, default=False)
     entregado = db.Column(db.Boolean, default=False)
+    estado = db.Column(db.String(50), default='en preparación')
 
 with app.app_context():
     db.create_all()   
 
-     
 def ping():
     return jsonify({'status': 'ok'})
-
 
 def obtener_estado_solicitud_desde_bd(id, rut):
     envio = Envio.query.filter_by(id=id, rutDestinatario=rut).first()
@@ -72,12 +71,16 @@ def validar_rut(id, rut, url):
             return jsonify({'error': 'RUT no válido para verificación'}), 400
     else:
         return jsonify({'error': 'RUT del URL no coincide con el RUT proporcionado'}), 400
-
+"""
+Verifica el rut port id y rut del destinatario con el link
+"""
 @app.route("/verificar_rut/<int:id>/<string:rut>", methods=["GET"])
 def verificarRut(id, rut):
     return validar_rut(id, rut, "https://portal.sidiv.registrocivil.cl/usuarios-portal/pages/DocumentRequestStatus.xhtml?RUN=21390811-1&type=CEDULA&serial=529885698")
 
-
+"""
+muestra un listado de envios por pagar(los paga el destinatario independientemente si hay o no reparto domiciolio)
+"""
 @app.route("/envios/por_pagar", methods=["GET"])
 def obtener_primer_envio_por_pagar():
     envios = Envio.query.filter_by(porPagar=True).all()
@@ -112,7 +115,10 @@ def enviarCorreo(correo, id, destinatario):
     except Exception as e:
         print("0")
 
-
+"""
+Router para cuando se entregue un paquete modifique el paquete a entregado enviando el correo al remitente.
+pd: sale destinatario pero tiene que ser remitente
+"""
 @app.route("/entregarEnvio/<int:id>/<string:correo>/<string:destinatario>", methods=["PATCH"])
 def modificarEnvio(id, correo, destinatario):
     data = request.json
@@ -126,7 +132,28 @@ def modificarEnvio(id, correo, destinatario):
         return jsonify({"message": "Envío modificado y correo enviado correctamente"}), 200
     else:
         return jsonify({"error": "Envío no encontrado"}), 404
+    
 
+"""
+Router que sirve para cambiar el estado del paquete por id y recolecta el /estado desde el front 
+"""
+@app.route("/envios/<int:id>/estado", methods=["PATCH"])
+def actualizar_estado_envio(id):
+    data = request.json
+    nuevo_estado = data.get('estado')
+
+    envio = Envio.query.get(id)
+    if envio:
+        envio.estado = nuevo_estado
+        db.session.commit()
+        return jsonify({"message": "Estado del envío actualizado correctamente"}), 200
+    else:
+        return jsonify({"error": "Envío no encontrado"}), 404
+
+"""
+Devuelve un envio por id, se diferencia solo por la estension del router
+sirve para mostrar toda la info actualizada de un envio
+"""
 @app.route("/detalle_envio/<int:id>", methods=["GET"])
 def detalles_envio(id):
     envio = Envio.query.filter_by(id=id).first()
@@ -152,7 +179,8 @@ def detalles_envio(id):
         "repartoADomicilio": envio.repartoADomicilio,
         "rutDestinatario": envio.rutDestinatario,
         "pagado": envio.pagado,
-        "entregado": envio.entregado
+        "entregado": envio.entregado,
+        "estado": envio.estado
     }
     return jsonify(envio_data)
 

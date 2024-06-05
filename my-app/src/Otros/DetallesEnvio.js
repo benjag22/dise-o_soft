@@ -16,8 +16,31 @@ const DetallesEnvio = () => {
     fetchEnvioDetails();
   }, [id]);
 
+  const actualizarEstado = async () => {
+    const siguienteEstado = obtenerSiguienteEstado(envio.estado);
+    const response = await fetch(`http://127.0.0.1:4000/envios/${id}/estado`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ estado: siguienteEstado }),
+    });
+
+    if (response.ok) {
+      setEnvio({ ...envio, estado: siguienteEstado });
+    } else {
+      alert('Error al actualizar el estado del envío');
+    }
+  };
+
+  const obtenerSiguienteEstado = (estadoActual) => {
+    const estados = ['en preparación', 'en transito', 'en sucursal', 'en reparto', 'entregado'];
+    const indiceActual = estados.indexOf(estadoActual);
+    return indiceActual < estados.length - 1 ? estados[indiceActual + 1] : estadoActual;
+  };
+
   if (!envio) {
-    return <div>No se encontro el envio</div>;
+    return <div>No se encontró el envío</div>;
   }
 
   return (
@@ -42,6 +65,8 @@ const DetallesEnvio = () => {
       <p><strong>RUT Destinatario:</strong> {envio.rutDestinatario}</p>
       <p><strong>Pagado:</strong> {envio.pagado ? 'Sí' : 'No'}</p>
       <p><strong>Entregado:</strong> {envio.entregado ? 'Sí' : 'No'}</p>
+      <p><strong>Estado:</strong> {envio.estado}</p>
+      <button onClick={actualizarEstado}>Actualizar Estado</button>
     </div>
   );
 };

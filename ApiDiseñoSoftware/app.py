@@ -12,26 +12,26 @@ db = SQLAlchemy(app)
 # Definición del modelo Envio
 class Envio(db.Model):
     __tablename__ = 'envios'
-
-    id = db.Column(db.Integer, primary_key=True)
-    remitente = db.Column(db.String(50))
-    destinatario = db.Column(db.String(50))
-    fono = db.Column(db.String(50))
-    direccionEnvio = db.Column(db.String(120))
-    ciudad = db.Column(db.String(50))
-    tipoEnvio = db.Column(db.String(50))
-    correo = db.Column(db.String(50))
-    porPagar = db.Column(db.Boolean)
-    fechaRecepcion = db.Column(db.String(50))
-    codigoPostal = db.Column(db.String(50))
-    esSobre = db.Column(db.Boolean)
-    peso = db.Column(db.Float)
-    recogidaADomicilio = db.Column(db.Boolean)
-    direccionRemitente = db.Column(db.String(120))
-    repartoADomicilio = db.Column(db.Boolean)
-    rutDestinatario = db.Column(db.String(10))
-    pagado = db.Column(db.Boolean, default=False)
-    entregado = db.Column(db.Boolean, default=False)
+    id = db.Column(db.Integer, primary_key=True)  #Listo
+    remitente = db.Column(db.String(50))  # Listo
+    destinatario = db.Column(db.String(50)) #listo
+    fono = db.Column(db.String(50)) #listo
+    direccionEnvio = db.Column(db.String(120)) #listo
+    ciudad = db.Column(db.String(50)) # listo
+    tipoEnvio = db.Column(db.String(50)) # listo
+    correo = db.Column(db.String(50)) #listo
+    porPagar = db.Column(db.Boolean) #listo
+    fechaRecepcion = db.Column(db.String(50)) #listo
+    codigoPostal = db.Column(db.String(50)) #listo
+    esSobre = db.Column(db.Boolean) #listo
+    peso = db.Column(db.Float) #listo
+    recogidaADomicilio = db.Column(db.Boolean) #listo
+    direccionRemitente = db.Column(db.String(120)) #listo
+    repartoADomicilio = db.Column(db.Boolean) #listo
+    rutDestinatario = db.Column(db.String(10)) #listo
+    pagado = db.Column(db.Boolean, default=False) #listo
+    entregado = db.Column(db.Boolean, default=False) #listo
+    estado = db.Column(db.String(50), default='en preparación') # listo
 
 with app.app_context():
     db.create_all()   
@@ -60,7 +60,8 @@ def submit():
                 repartoADomicilio=data.get('repartoADomicilio'),
                 rutDestinatario = data.get('rutDestinatario'),
                 pagado = data.get('pagado'),
-                entregado = data.get('entregado')
+                entregado = data.get('entregado'),
+                estado = data.get('entregado')
             )
             db.session.add(envio)
             db.session.commit()
