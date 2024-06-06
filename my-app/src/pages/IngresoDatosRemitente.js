@@ -5,70 +5,156 @@ import "../Formulario/ButtonStyle.css";
 import { BotonNavegar } from "../components/BotonNavegar";
 import { useNavigate } from 'react-router-dom';
 
-
 export function IngresoDatosRemitente() {
-    const [Remitente, setRemitente] = useState("");
-    const [Correo, setEmail] = useState("");
-    const [Recogida_a_domicilio, setRecogidaADomicilio] = useState(false);
-    const [Direccion_remitente, setDireccion_recogida] = useState("");
+const [rut_remitente,setRut_remitente]= useState("")
+const [remitente, setRemitente] = useState("");
+const [correo, setEmail] = useState("");
+const [recogida_a_domicilio, setRecogidaADomicilio] = useState(false);
+const [direccion_remitente, setDireccion_recogida] = useState("");
 
 
-    const navigate = useNavigate();
+const navigate = useNavigate();
 
-    const redirectToPage = () => {
-        navigate('/IngresoDatosDestinatario');
-    };
-    return (
-        <form className="form-register" id="div_remitente" onSubmit={redirectToPage}>
-            <h4>Datos Remitente</h4>
-            <label className="info_campo" htmlFor="nombre">Nombre completo</label>
+const redirectToPage = () => {
+    navigate('/IngresoDatosDestinatario');
+};
+const validarCorreo = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+const validarRut=(rut)=>{
+    const regex = /^(\d{1,2}(?:[\.]?\d{3}){2}-[\dkK])$/;
+    return regex.test(rut_remitente)
+};
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validarCorreo(correo)) {
+        alert("Por favor, ingrese un correo electrónico válido.");
+        return;
+    }
+    if (!validarRut(rut_remitente)) {
+        alert("Por favor, ingrese un RUT válido.");
+        return;
+    }
+
+    const responseClient = await fetch(`http://127.0.0.1:5000/clientes/${rut_remitente}`);
+    const data = await responseClient.json();
+
+    if (responseClient.status === 404) {
+        // Crea al cliente
+        const res = await fetch("http://127.0.0.1:5000/clientes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                rut: rut_remitente,
+                nombre: remitente
+            }),
+        });
+
+        if (res.ok) {
+            // Crear Remitente
+            const resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    rut_remitente: rut_remitente,
+                    correo: correo,
+                    direccion: direccion_remitente
+                }),
+            });
+
+            if (resRemitente.ok) {
+                redirectToPage();
+            } else {
+                console.error('Error al crear remitente:', await resRemitente.text());
+            }
+        } else {
+            console.error('Error al crear el Cliente:', await res.text());
+        }
+    } else {
+        // Cliente existe entonces se crea un remitente con el rut del cliente
+        const resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                rut_remitente: rut_remitente,
+                correo: correo,
+                direccion: direccion_remitente
+            }),
+        });
+        if (resRemitente.ok) {
+            redirectToPage();
+        } else {
+            console.error('Error al crear remitente:', await resRemitente.text());
+        }
+    }
+};
+
+
+return (
+    <form className="form-register" id="div_remitente" onSubmit={handleSubmit}>
+        <h2>Datos Remitente</h2>
+
+        <label className="info_campo" htmlFor="nombre">Ingrese su RUT</label>
+        <input
+            className="controls"
+            type="text"
+            value={rut_remitente}
+            placeholder="Ingrese su nombre"
+            onChange={(e) => setRut_remitente(e.target.value)}
+            id="nombre"
+            required
+        />
+        <label className="info_campo" htmlFor="nombre">Nombre completo</label>
+        <input
+            className="controls"
+            type="text"
+            value={remitente}
+            placeholder="Ingrese su nombre"
+            onChange={(e) => setRemitente(e.target.value)}
+            id="nombre"
+            required
+        />
+        <label className="info_campo" htmlFor="correo">Correo electronico</label>
+        <input
+            className="controls"
+            type="email"
+            value={correo}
+            placeholder="Ingrese su correo"
+            onChange={(e) => setEmail(e.target.value)}
+            id="correo"
+            required
+        />
+        <label className="info_campo" htmlFor="direccionRecogida">
+            Recogida a domicilio
+        </label>
+        <select
+            className="controls"
+            value={recogida_a_domicilio}
+            onChange={(e) => setRecogidaADomicilio(e.target.value === "true")}
+        >
+            <option disabled value="">
+            Seleccione una opción
+            </option>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+        </select>
+            <label>Ingrese su dirección</label>
             <input
                 className="controls"
                 type="text"
-                value={Remitente}
-                placeholder="Ingrese su nombre"
-                onChange={(e) => setRemitente(e.target.value)}
-                id="nombre"
-                required
+                value={direccion_remitente}
+                placeholder="Ingrese su dirección de recogida"
+                onChange={(e) => setDireccion_recogida(e.target.value)}
             />
-            <label className="info_campo" htmlFor="correo">Correo electronico</label>
-            <input
-                className="controls"
-                type="email"
-                value={Correo}
-                placeholder="Ingrese su correo"
-                onChange={(e) => setEmail(e.target.value)}
-                id="correo"
-                required
-            />
-            <label className="info_campo" htmlFor="direccionRecogida">
-                Recogida a domicilio
-            </label>
-            <select
-                className="controls"
-                value={Recogida_a_domicilio}
-                onChange={(e) => setRecogidaADomicilio(e.target.value === "true")}
-            >
-                <option disabled value="">
-                Seleccione una opción
-                </option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-            </select>
-            {Recogida_a_domicilio === true && (
-                <div>
-                    <label>Direccion Recogida</label>
-                    <input
-                    className="controls"
-                    type="text"
-                    value={Direccion_remitente}
-                    placeholder="Ingrese su dirección de recogida"
-                    onChange={(e) => setDireccion_recogida(e.target.value)}
-                    />
-                </div>
-            )}
-            <BotonNavegar paginaAntes="/" botonsiguientetexto="siguiente"/>
-        </form>
-    )
+        <BotonNavegar paginaAntes="/" botonsiguientetexto="siguiente"/>
+    </form>
+)
 }
-
