@@ -103,6 +103,21 @@ def create_remitente():
     db.session.commit()
     return jsonify({'message': 'nuevo remitente creado'}), 201
 
+@app.route('/destinatarios', methods=['POST'])
+def create_destinatario():
+    data = request.get_json()
+    if not data or not 'rut_destinatario' in data or not 'telefono' in data or not 'direccion' in data:
+        return jsonify({'message': 'Datos inválidos'}), 400
+
+    cliente = Cliente.query.get(data['rut_destinatario'])
+    if not cliente:
+        return jsonify({'message': 'Cliente no encontrado'}), 404
+
+    new_destinatario = Destinatario(rut_destinatario=data['rut_destinatario'], telefono=data['telefono'], direccion=data['direccion'])
+    db.session.add(new_destinatario)
+    db.session.commit()
+    return jsonify({'message': 'Nuevo destinatario creado'}), 201
+
 
 with app.app_context():
     db.create_all()
