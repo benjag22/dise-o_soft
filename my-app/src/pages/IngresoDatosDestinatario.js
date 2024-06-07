@@ -77,11 +77,6 @@ export function IngresoDatosDestinatario() {
                     direccion: direccion
                 }),
             });
-            if (resDestinatario.ok) {
-                navigate('/IngresoDatosDeEnvio');
-            } else {
-                console.error('Error al crear destinatario:', await resDestinatario.text());
-            }
         }
     };
 
@@ -128,21 +123,6 @@ export function IngresoDatosDestinatario() {
                 id="direccion"
                 required
             />
-            {/*<label className="Info_campo" htmlFor="repartoADomicilio">
-                Reparto a domicilio
-            </label>
-            <select
-                className="controls"
-                value={repartoADomicilio}
-                onChange={(e) => setRepartoADomicilio(e.target.value === "true")}
-            >
-                <option disabled value="">
-                    Seleccione una opción
-                </option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-            </select>*/}
-
             <BotonError mensaje="hola mundo" />
             <BotonNavegar paginaAntes="/IngresoDatosRemitente" />
         </form>

@@ -11,7 +11,7 @@ const [remitente, setRemitente] = useState("");
 const [correo, setEmail] = useState("");
 const [recogida_a_domicilio, setRecogidaADomicilio] = useState(false);
 const [direccion_remitente, setDireccion_recogida] = useState("");
-
+const [remitenteId, setRemitenteId] = useState(null);  // ID por defecto
 
 const navigate = useNavigate();
 
@@ -89,11 +89,6 @@ const handleSubmit = async (e) => {
                 direccion: direccion_remitente
             }),
         });
-        if (resRemitente.ok) {
-            redirectToPage();
-        } else {
-            console.error('Error al crear remitente:', await resRemitente.text());
-        }
     }
 };
 

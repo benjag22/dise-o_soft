@@ -16,9 +16,17 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <h1>Bienvenido a la Plataforma de Envíos</h1>
-      <h2>Gestiona tus envíos de manera rápida y sencilla</h2>
+      <h1>Proyecto de envios</h1>
+      <br></br>
+      <br></br>
+      <br></br>
+
       <BuscarEnvio />
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      
       <div className="button-container">
         <button onClick={irAEnviosPorPagar}>Ver Envíos</button>
         <button onClick={irAcrearEnvio}>Crear Envío</button>
