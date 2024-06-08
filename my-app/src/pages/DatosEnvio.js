@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import "../Formulario/formularioCSS.css";
 import "../Formulario/ButtonStyle.css";
 import { BotonNavegar } from "../components/BotonNavegar"
+import { BotonError } from "../components/BotonError";
 
 export function DatosEnvio() {
 
@@ -19,6 +20,7 @@ export function DatosEnvio() {
     const [por_pagar, setPor_pagar] = useState(false);
     const [reparto_a_domicilio, setReparto_a_domicilio] = useState(false);
 
+    const [mensajeError, setMensajeError] = useState("");
 
     const navigate = useNavigate();
     //funciones varias para el jsx
@@ -36,7 +38,7 @@ export function DatosEnvio() {
             },
             body: JSON.stringify({
                 tipo,
-                peso:parseFloat(peso)
+                peso: parseFloat(peso)
             }),
         });
 
@@ -72,50 +74,38 @@ export function DatosEnvio() {
         };
         alert(JSON.stringify(data, null, 2));
     };
-    
+
     return (
         <div>
-        <pre>
-                {JSON.stringify({
-                    tipo,
-                    peso,
-                    cod_postal,
-                    tipo_envio,
-                    pagado,
-                    recogida_a_domicilio,
-                    reparto_a_domicilio,
-                    por_pagar
-                }, null, 2)}
-            </pre>
-         
-        <form className="form-register" id="div_envio" onSubmit={redirectToPage}>
-            <h4>Datos de envio</h4>
-            <label className="info_campo">Código postal</label>
-            <input
-                className="controls"
-                type="text"
-                value={cod_postal}
-                placeholder="Ingrese codigo postal"
-                onChange={(e) => setCodigo_postal(e.target.value)}
-                required
-            />
-            <label className="info_campo" htmlFor="tipo_entrega">
-                Tipo de entrega
-            </label>
-            <select
-                name="tipo_entrega"
-                className="controls"
-                value={tipo_envio}
-                onChange={(e) => setTipo_de_envio(e.target.value)}
-            >
-                <option disabled value="">
-                Selecciona una opción
-                </option>
-                <option value="Entrega en el dia">Entrega en el día</option>
-                <option value="Entrega rapida">Entrega rápida</option>
-                <option value="Entrega normal">Entrega normal</option>
-            </select>
-            <label className="info_campo" htmlFor="tipo_paquete">
+
+            <form className="form-register" id="div_envio" onSubmit={redirectToPage}>
+                <h4>Datos de envio</h4>
+                <label className="info_campo">Código postal</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={cod_postal}
+                    placeholder="Ingrese codigo postal"
+                    onChange={(e) => setCodigo_postal(e.target.value)}
+                    required
+                />
+                <label className="info_campo" htmlFor="tipo_entrega">
+                    Tipo de entrega
+                </label>
+                <select
+                    name="tipo_entrega"
+                    className="controls"
+                    value={tipo_envio}
+                    onChange={(e) => setTipo_de_envio(e.target.value)}
+                >
+                    <option disabled value="">
+                        Selecciona una opción
+                    </option>
+                    <option value="Entrega en el dia">Entrega en el día</option>
+                    <option value="Entrega rapida">Entrega rápida</option>
+                    <option value="Entrega normal">Entrega normal</option>
+                </select>
+                <label className="info_campo" htmlFor="tipo_paquete">
                     Tipo de paquete
                 </label>
                 <select
@@ -144,49 +134,49 @@ export function DatosEnvio() {
                     </React.Fragment>
                 )}
 
-            <label className="etiquetas" htmlFor="pago">
-                Pagado por
-            </label>
-            <select
-                name="pago"
-                className="controls"
-                value={por_pagar ? "true" : "false"}
-                onChange={(e) => setPor_pagar(e.target.value === "true")}
-            >
-                <option disabled selected hidden value="">
-                Selecciona una opción
-                </option>
-                <option value="false">Remitente</option>
-                <option value="true">Destinatario</option>
-            </select>
-            <label className="etiquetas" htmlFor="pago">Recogida a domicilio</label>
-            <select
-                name="pago"
-                className="controls"
-                value={recogida_a_domicilio ? "true" : "false"}
-                onChange={(e) => setRecogida_a_domicilio(e.target.value === "true")}>
-                <option disabled selected hidden value="">
-                Selecciona una opción
-                </option>
-                <option value="true">Si</option>
-                <option value="false">No</option>
-            </select>
-            <label className="etiquetas" htmlFor="pago">Reparto a domicilio</label>
-            <select
-                name="pago"
-                className="controls"
-                value={reparto_a_domicilio ? "true" : "false"}
-                onChange={(e) => setReparto_a_domicilio(e.target.value === "true")}>
-                <option disabled selected hidden value="">
-                Selecciona una opción
-                </option>
-                <option value="true">Si</option>
-                <option value="false">No</option>
-            </select>
+                <label className="etiquetas" htmlFor="pago">
+                    Pagado por
+                </label>
+                <select
+                    name="pago"
+                    className="controls"
+                    value={por_pagar ? "true" : "false"}
+                    onChange={(e) => setPor_pagar(e.target.value === "true")}
+                >
+                    <option disabled selected hidden value="">
+                        Selecciona una opción
+                    </option>
+                    <option value="false">Remitente</option>
+                    <option value="true">Destinatario</option>
+                </select>
+                <label className="etiquetas" htmlFor="pago">Recogida a domicilio</label>
+                <select
+                    name="pago"
+                    className="controls"
+                    value={recogida_a_domicilio ? "true" : "false"}
+                    onChange={(e) => setRecogida_a_domicilio(e.target.value === "true")}>
+                    <option disabled selected hidden value="">
+                        Selecciona una opción
+                    </option>
+                    <option value="true">Si</option>
+                    <option value="false">No</option>
+                </select>
+                <label className="etiquetas" htmlFor="pago">Reparto a domicilio</label>
+                <select
+                    name="pago"
+                    className="controls"
+                    value={reparto_a_domicilio ? "true" : "false"}
+                    onChange={(e) => setReparto_a_domicilio(e.target.value === "true")}>
+                    <option disabled selected hidden value="">
+                        Selecciona una opción
+                    </option>
+                    <option value="true">Si</option>
+                    <option value="false">No</option>
+                </select>
+                <BotonError mensaje={mensajeError} />
+                <BotonNavegar paginaAntes="/IngresoDatosDestinatario" />
 
-            <BotonNavegar paginaAntes="/IngresoDatosDestinatario"/>
-
-        </form>
+            </form>
         </div>
     )
 }

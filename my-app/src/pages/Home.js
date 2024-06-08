@@ -26,7 +26,7 @@ export default function Home() {
       <br></br>
       <br></br>
       <br></br>
-      
+
       <div className="button-container">
         <button onClick={irAEnviosPorPagar}>Ver Envíos</button>
         <button onClick={irAcrearEnvio}>Crear Envío</button>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import "../Formulario/formularioCSS.css";
 import "../Formulario/ButtonStyle.css";
+import "../Formulario/formularioCSS.css";
 import { BotonNavegar } from "../components/BotonNavegar";
 import { useNavigate } from 'react-router-dom';
 import { BotonError } from "../components/BotonError";
@@ -12,17 +12,29 @@ export function IngresoDatosDestinatario() {
     const [direccion, setDireccion] = useState("");
 
     const navigate = useNavigate();
+    
+    const [mensajeError, setMensajeError] = useState("");
 
     const validarRut = (rut) => {
         const regex = /^(\d{1,2}(?:[\.]?\d{3}){2}-[\dkK])$/;
         return regex.test(rut);
     };
 
+    const validarTelefono = (fono) =>{
+        const regex = /^[0-9,$]*$/;
+        return regex.test(fono);
+
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!validarRut(rutDestinatario)) {
-            alert("Por favor, ingrese un RUT válido.");
+            setMensajeError("Por favor, ingrese un RUT válido.");
+            return;
+        }
+        if(!validarTelefono(fono)){
+            setMensajeError("Por favor, ingrese un telefono válido.");
             return;
         }
 
@@ -123,7 +135,7 @@ export function IngresoDatosDestinatario() {
                 id="direccion"
                 required
             />
-            <BotonError mensaje="hola mundo" />
+            <BotonError mensaje={mensajeError} />
             <BotonNavegar paginaAntes="/IngresoDatosRemitente" />
         </form>
     );
