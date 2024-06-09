@@ -1,18 +1,27 @@
+*{
+  background-image: "../Formulario/fondo_formulario.png";
+  justify-content: center;
+}
+
 .home-container {
     text-align: center;
     padding: 50px;
-    background-color: #f4f4f4;
-    min-height: 100vh;
+    background-color: #24303c;
+    min-height: 50vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 60%;
+    height:10%;
+    margin-left: 20%;
+    margin-top: 5%;
   }
   
   .home-container h1 {
     font-size: 3em;
     margin-bottom: 20px;
-    color: #333;
+    color: #fff;
   }
   
   .home-container h2 {

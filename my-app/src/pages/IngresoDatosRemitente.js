@@ -118,7 +118,6 @@ export function IngresoDatosRemitente() {
 
     return (
         <>
-            <NavBar/>
             <form className="form-register" id="div_remitente" onSubmit={handleSubmit}>
                 <h2>Datos Remitente</h2>
 

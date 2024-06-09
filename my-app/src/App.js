@@ -6,9 +6,11 @@ import { IngresoDatosRemitente } from './pages/IngresoDatosRemitente';
 import { IngresoDatosDestinatario } from './pages/IngresoDatosDestinatario';
 import { DatosEnvio } from './pages/DatosEnvio';
 import DetallesEnvio from './Otros/DetallesEnvio'
+import { NavBar } from './components/NavBar';
 function App() {
     return (
       <Router>
+        <NavBar/>
         <Routes>
           <Route path='/' element={<Home/>}/>
           <Route path='/enviosPorPagar' element={<EnviosComponent/>}/>
