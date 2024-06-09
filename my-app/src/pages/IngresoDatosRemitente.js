@@ -5,6 +5,7 @@ import "../Formulario/ButtonStyle.css";
 import { BotonNavegar } from "../components/BotonNavegar";
 import { useNavigate } from 'react-router-dom';
 import { BotonError } from "../components/BotonError";
+import {NavBar} from "../components/NavBar";
 
 export function IngresoDatosRemitente() {
     const [rut_remitente, setRut_remitente] = useState("")
@@ -97,63 +98,66 @@ export function IngresoDatosRemitente() {
 
 
     return (
-        <form className="form-register" id="div_remitente" onSubmit={handleSubmit}>
-            <h2>Datos Remitente</h2>
+        <>
+            <NavBar/>
+            <form className="form-register" id="div_remitente" onSubmit={handleSubmit}>
+                <h2>Datos Remitente</h2>
 
-            <label className="info_campo" htmlFor="nombre">Ingrese su RUT</label>
-            <input
-                className="controls"
-                type="text"
-                value={rut_remitente}
-                placeholder="Ingrese su nombre"
-                onChange={(e) => setRut_remitente(e.target.value)}
-                id="nombre"
-                required
-            />
-            <label className="info_campo" htmlFor="nombre">Nombre completo</label>
-            <input
-                className="controls"
-                type="text"
-                value={remitente}
-                placeholder="Ingrese su nombre"
-                onChange={(e) => setRemitente(e.target.value)}
-                id="nombre"
-                required
-            />
-            <label className="info_campo" htmlFor="correo">Correo electronico</label>
-            <input
-                className="controls"
-                type="email"
-                value={correo}
-                placeholder="Ingrese su correo"
-                onChange={(e) => setEmail(e.target.value)}
-                id="correo"
-                required
-            />
-            <label className="info_campo" htmlFor="direccionRecogida">
-                Recogida a domicilio
-            </label>
-            <select
-                className="controls"
-                value={recogida_a_domicilio}
-                onChange={(e) => setRecogidaADomicilio(e.target.value === "true")}
-            >
-                <option disabled value="">
-                    Seleccione una opción
-                </option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-            </select>
-            <label className="info_campo">Ingrese su dirección</label>
-            <input
-                className="controls"
-                type="text"
-                value={direccion_remitente}
-                placeholder="Ingrese su dirección de recogida"
-                onChange={(e) => setDireccion_recogida(e.target.value)}
-            />
-            <BotonError mensaje={mensajeError} />
-            <BotonNavegar paginaAntes="/" botonsiguientetexto="siguiente"/>
-        </form>
+                <label className="info_campo" htmlFor="nombre">Ingrese su RUT</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={rut_remitente}
+                    placeholder="Ingrese su nombre"
+                    onChange={(e) => setRut_remitente(e.target.value)}
+                    id="nombre"
+                    required
+                />
+                <label className="info_campo" htmlFor="nombre">Nombre completo</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={remitente}
+                    placeholder="Ingrese su nombre"
+                    onChange={(e) => setRemitente(e.target.value)}
+                    id="nombre"
+                    required
+                />
+                <label className="info_campo" htmlFor="correo">Correo electronico</label>
+                <input
+                    className="controls"
+                    type="email"
+                    value={correo}
+                    placeholder="Ingrese su correo"
+                    onChange={(e) => setEmail(e.target.value)}
+                    id="correo"
+                    required
+                />
+                <label className="info_campo" htmlFor="direccionRecogida">
+                    Recogida a domicilio
+                </label>
+                <select
+                    className="controls"
+                    value={recogida_a_domicilio}
+                    onChange={(e) => setRecogidaADomicilio(e.target.value === "true")}
+                >
+                    <option disabled value="">
+                        Seleccione una opción
+                    </option>
+                    <option value="true">Sí</option>
+                    <option value="false">No</option>
+                </select>
+                <label className="info_campo">Ingrese su dirección</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={direccion_remitente}
+                    placeholder="Ingrese su dirección de recogida"
+                    onChange={(e) => setDireccion_recogida(e.target.value)}
+                />
+                <BotonError mensaje={mensajeError} />
+                <BotonNavegar paginaAntes="/" botonsiguientetexto="siguiente"/>
+            </form>
+        </>
     )
 }

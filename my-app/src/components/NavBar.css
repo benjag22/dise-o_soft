@@ -1,0 +1,12 @@
+nav{
+    background-color: #24303c;
+    justify-content: center;
+    height: 50px;
+    text-align: center;
+}
+#boton_home{
+    display:inline;
+    color: #FFFFFF;
+    width: 30%;
+
+}
