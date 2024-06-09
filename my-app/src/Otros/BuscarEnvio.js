@@ -25,6 +25,7 @@ function BuscarEnvio() {
     <div>
       <form onSubmit={handleSubmit}>
         <input
+          id = "buscaEnvioInput"
           type="text"
           value={envioId}
           onChange={handleInputChange}

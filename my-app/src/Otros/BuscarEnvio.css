@@ -3,13 +3,14 @@ form {
     align-items: center;
   }
   
-  input[type="text"] {
+  #buscaEnvioInput {
     padding: 5px;
     border: 1px solid #ccc;
     margin-right: 10px;
     width: 50%;
     height: 60px;
     font-size: larger;
+    border-radius: 10px;
   }
   
   button {
