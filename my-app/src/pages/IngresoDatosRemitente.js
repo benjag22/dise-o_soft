@@ -49,7 +49,6 @@ export function IngresoDatosRemitente() {
             // Remitente existe, usar su ID
             console.log(dataRemitente.id)
             setRemitenteId(dataRemitente.id);
-            redirectToPage(dataRemitente.id);
         } else if (responseBuscar.status === 404) {
             // Cliente no encontrado, entonces crearlo
             const responseCliente = await fetch(`http://127.0.0.1:5000/clientes/${rut_remitente}`);
@@ -107,7 +106,6 @@ export function IngresoDatosRemitente() {
 
                 if (resRemitente.ok) {
                     const dataRemitente = await resRemitente.json();
-                    redirectToPage(dataRemitente.id);
                 } else {
                     console.error('Error al crear remitente:', await resRemitente.text());
                 }
