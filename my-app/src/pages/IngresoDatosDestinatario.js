@@ -71,10 +71,10 @@ export function IngresoDatosDestinatario() {
                 if (resDestinatario.ok) {
                     navigate('/IngresoDatosDeEnvio');
                 } else {
-                    console.error('Error al crear destinatario:', await resDestinatario.text());
+                    setMensajeError('Error al crear destinatario:'+ await resDestinatario.text());
                 }
             } else {
-                console.error('Error al crear el Cliente:', await res.text());
+                setMensajeError('Error al crear el Cliente:'+ await res.text());
             }
         } else {
             // Cliente existe entonces se crea un destinatario con el rut del cliente

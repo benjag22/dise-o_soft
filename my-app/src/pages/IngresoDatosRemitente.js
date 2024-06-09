@@ -74,10 +74,10 @@ export function IngresoDatosRemitente() {
                 if (resRemitente.ok) {
                     redirectToPage();
                 } else {
-                    console.error('Error al crear remitente:', await resRemitente.text());
+                    setMensajeError('Error al crear remitente:' + await resRemitente.text());
                 }
             } else {
-                console.error('Error al crear el Cliente:', await res.text());
+                setMensajeError('Error al crear el Cliente:' + await res.text());
             }
         } else {
             // Cliente existe entonces se crea un remitente con el rut del cliente
@@ -152,8 +152,8 @@ export function IngresoDatosRemitente() {
                 placeholder="Ingrese su dirección de recogida"
                 onChange={(e) => setDireccion_recogida(e.target.value)}
             />
-            <BotonError mensaje={mensajeError}/>
-            <BotonNavegar paginaAntes="/" botonsiguientetexto="siguiente" />
+            <BotonError mensaje={mensajeError} />
+            <BotonNavegar paginaAntes="/" botonsiguientetexto="siguiente"/>
         </form>
     )
 }
