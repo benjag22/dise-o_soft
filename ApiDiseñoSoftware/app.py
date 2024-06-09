@@ -119,6 +119,32 @@ def get_remitente(id):
         'direccion': remitente.direccion
     })
 
+@app.route('/remitentes/buscar', methods=['GET'])
+def buscar_remitente():
+    rut = request.args.get('rut')
+    direccion = request.args.get('direccion')
+    correo = request.args.get('correo')
+    
+    if not rut or not direccion or not correo:
+        return jsonify({'message': 'Faltan datos'}), 400
+
+    remitente = Remitente.query.filter_by(
+        rut_remitente=rut,
+        direccion=direccion,
+        correo=correo
+    ).first()
+
+    if not remitente:
+        return jsonify({'message': 'No se encontró ningún remitente con esos datos'}), 404
+
+    return jsonify({
+        'id': remitente.id,
+        'rut_remitente': remitente.rut_remitente,
+        'correo': remitente.correo,
+        'direccion': remitente.direccion
+    }), 200
+
+
 @app.route('/destinatarios', methods=['POST'])
 def create_destinatario():
     data = request.get_json()
@@ -146,6 +172,32 @@ def get_destinatario(id):
         'telefono': destinatario.telefono,
         'direccion': destinatario.direccion
     })
+
+@app.route('/destinatarios/buscar', methods=['GET'])
+def buscar_destinatario():
+    rut = request.args.get('rut')
+    direccion = request.args.get('direccion')
+    telefono = request.args.get('telefono')
+    
+    if not rut or not direccion or not telefono:
+        return jsonify({'message': 'Faltan datos'}), 400
+
+    destinatario = Destinatario.query.filter_by(
+        rut_destinatario=rut,
+        direccion=direccion,
+        telefono=telefono
+    ).first()
+
+    if not destinatario:
+        return jsonify({'message': 'No se encontró ningún destinatario con esos datos'}), 404
+
+    return jsonify({
+        'id': destinatario.id,
+        'rut_destinatario': destinatario.rut_destinatario,
+        'telefono': destinatario.telefono,
+        'direccion': destinatario.direccion
+    }), 200
+
 
 @app.route('/paquetes/<int:id>', methods=['GET'])
 def get_paquete(id):

@@ -38,28 +38,61 @@ export function IngresoDatosRemitente() {
             return;
         }
         if (!validarRut(rut_remitente)) {
-            setMensajeError("Por favor, ingrese un RUT válido.")
+            setMensajeError("Por favor, ingrese un RUT válido.");
             return;
         }
 
-        const responseClient = await fetch(`http://127.0.0.1:5000/clientes/${rut_remitente}`);
-        const data = await responseClient.json();
+        // Primero, buscar si el remitente ya existe
+        const responseBuscar = await fetch(`http://127.0.0.1:5000/remitentes/buscar?rut=${rut_remitente}&direccion=${direccion_remitente}&correo=${correo}`);
+        
+        if (responseBuscar.ok) {
+            const dataRemitente = await responseBuscar.json();
+            // Remitente existe, usar su ID
+            console.log(dataRemitente.id)
+            setRemitenteId(dataRemitente.id);
+        } else if (responseBuscar.status === 404) {
+            // Cliente no encontrado, entonces crearlo
+            const responseCliente = await fetch(`http://127.0.0.1:5000/clientes/${rut_remitente}`);
+            const dataCliente = await responseCliente.json();
 
-        if (responseClient.status === 404) {
-            // Crea al cliente
-            const res = await fetch("http://127.0.0.1:5000/clientes", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    rut: rut_remitente,
-                    nombre: remitente
-                }),
-            });
+            if (responseCliente.status === 404) {
+                // Crea al cliente
+                const res = await fetch("http://127.0.0.1:5000/clientes", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        rut: rut_remitente,
+                        nombre: remitente
+                    }),
+                });
 
-            if (res.ok) {
-                // Crear Remitente
+                if (res.ok) {
+                    // Crear Remitente
+                    const resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            rut_remitente: rut_remitente,
+                            correo: correo,
+                            direccion: direccion_remitente
+                        }),
+                    });
+
+                    if (resRemitente.ok) {
+                        const dataRemitente = await resRemitente.json();
+                        redirectToPage(dataRemitente.id);
+                    } else {
+                        console.error('Error al crear remitente:', await resRemitente.text());
+                    }
+                } else {
+                    console.error('Error al crear el Cliente:', await res.text());
+                }
+            } else {
+                // Cliente existe, crear remitente
                 const resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
                     method: "POST",
                     headers: {
@@ -73,29 +106,15 @@ export function IngresoDatosRemitente() {
                 });
 
                 if (resRemitente.ok) {
-                    redirectToPage();
+                    const dataRemitente = await resRemitente.json();
                 } else {
-                    setMensajeError('Error al crear remitente:' + await resRemitente.text());
+                    console.error('Error al crear remitente:', await resRemitente.text());
                 }
-            } else {
-                setMensajeError('Error al crear el Cliente:' + await res.text());
             }
         } else {
-            // Cliente existe entonces se crea un remitente con el rut del cliente
-            const resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    rut_remitente: rut_remitente,
-                    correo: correo,
-                    direccion: direccion_remitente
-                }),
-            });
+            console.error('Error al buscar remitente:', await responseBuscar.text());
         }
     };
-
 
     return (
         <>

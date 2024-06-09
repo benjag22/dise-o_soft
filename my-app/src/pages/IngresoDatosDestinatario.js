@@ -33,29 +33,60 @@ export function IngresoDatosDestinatario() {
             setMensajeError("Por favor, ingrese un RUT válido.");
             return;
         }
-        if(!validarTelefono(fono)){
-            setMensajeError("Por favor, ingrese un telefono válido.");
+        if (!validarTelefono(fono)) {
+            setMensajeError("Por favor, ingrese un teléfono válido.");
             return;
         }
 
-        const responseClient = await fetch(`http://127.0.0.1:5000/clientes/${rutDestinatario}`);
-        const data = await responseClient.json();
+        // Primero, buscar si el destinatario ya existe
+        const responseBuscar = await fetch(`http://127.0.0.1:5000/destinatarios/buscar?rut=${rutDestinatario}&direccion=${direccion}&telefono=${fono}`);
+        
+        if (responseBuscar.ok) {
+            const dataDestinatario = await responseBuscar.json();
+            console.log(dataDestinatario.id)
+        } else if (responseBuscar.status === 404) {
+            // Cliente no encontrado, entonces crearlo
+            const responseCliente = await fetch(`http://127.0.0.1:5000/clientes/${rutDestinatario}`);
+            const dataCliente = await responseCliente.json();
 
-        if (responseClient.status === 404) {
-            // Crear cliente
-            const res = await fetch("http://127.0.0.1:5000/clientes", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    rut: rutDestinatario,
-                    nombre: destinatario
-                }),
-            });
+            if (responseCliente.status === 404) {
+                // Crear cliente
+                const res = await fetch("http://127.0.0.1:5000/clientes", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        rut: rutDestinatario,
+                        nombre: destinatario
+                    }),
+                });
 
-            if (res.ok) {
-                // Crear destinatario
+                if (res.ok) {
+                    // Crear destinatario
+                    const resDestinatario = await fetch("http://127.0.0.1:5000/destinatarios", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            rut_destinatario: rutDestinatario,
+                            telefono: fono,
+                            direccion: direccion
+                        }),
+                    });
+
+                    if (resDestinatario.ok) {
+                        const dataDestinatario = await resDestinatario.json();
+                           {/*aqui puede ir una ruta por ejemplo*/} 
+                    } else {
+                        setMensajeError('Error al crear destinatario:' + await resDestinatario.text());
+                    }
+                } else {
+                    setMensajeError('Error al crear el Cliente:' + await res.text());
+                }
+            } else {
+                // Cliente existe, crear destinatario
                 const resDestinatario = await fetch("http://127.0.0.1:5000/destinatarios", {
                     method: "POST",
                     headers: {
@@ -69,26 +100,13 @@ export function IngresoDatosDestinatario() {
                 });
 
                 if (resDestinatario.ok) {
-                    navigate('/IngresoDatosDeEnvio');
+                    const dataDestinatario = await resDestinatario.json();
                 } else {
-                    setMensajeError('Error al crear destinatario:'+ await resDestinatario.text());
+                    setMensajeError('Error al crear destinatario:' + await resDestinatario.text());
                 }
-            } else {
-                setMensajeError('Error al crear el Cliente:'+ await res.text());
             }
         } else {
-            // Cliente existe entonces se crea un destinatario con el rut del cliente
-            const resDestinatario = await fetch("http://127.0.0.1:5000/destinatarios", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    rut_destinatario: rutDestinatario,
-                    telefono: fono,
-                    direccion: direccion
-                }),
-            });
+            setMensajeError('Error al buscar destinatario:' + await responseBuscar.text());
         }
     };
 
