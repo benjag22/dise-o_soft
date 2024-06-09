@@ -10,3 +10,10 @@ nav{
     width: 30%;
 
 }
+
+#nav_bar_inicio{
+    position:fixed;
+    width:100%;
+    margin: 0px;
+    top:0;
+}

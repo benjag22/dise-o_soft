@@ -7,6 +7,9 @@ form {
     padding: 5px;
     border: 1px solid #ccc;
     margin-right: 10px;
+    width: 50%;
+    height: 60px;
+    font-size: larger;
   }
   
   button {

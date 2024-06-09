@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import BuscarEnvio from '../Otros/BuscarEnvio';
 import './Home.css';
+import logo from '../components/assets/logo.png'
 
 export default function Home() {
   const navigate = useNavigate();
@@ -16,7 +17,8 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <h1>Proyecto de envios</h1>
+      <h1>Empresa de envios generica</h1>
+      <img src={logo} width="250"/>
       <br></br>
       <br></br>
       <br></br>
