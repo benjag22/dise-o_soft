@@ -227,6 +227,7 @@ def create_paquete():
     db.session.commit()
     return jsonify({'message': 'Nuevo paquete creado', 'id_paquete': new_paquete.id_paquete}), 201
 
+
 @app.route('/envios', methods=['POST'])
 def create_envio():
     data = request.get_json()

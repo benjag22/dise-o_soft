@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { format } from "date-fns";
+import React, { useState } from "react";
 import "../Formulario/formularioCSS.css";
 import "../Formulario/ButtonStyle.css";
 import { BotonNavegar } from "../components/BotonNavegar";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { BotonError } from "../components/BotonError";
-import {NavBar} from "../components/NavBar";
 
 export function IngresoDatosRemitente() {
+    const navigate = useNavigate();
     const [rut_remitente, setRut_remitente] = useState("")
     const [remitente, setRemitente] = useState("");
     const [correo, setEmail] = useState("");
     const [recogida_a_domicilio, setRecogidaADomicilio] = useState(false);
     const [direccion_remitente, setDireccion_recogida] = useState("");
-    const [remitenteId, setRemitenteId] = useState(null);  // ID por defecto
-
-    const navigate = useNavigate();
-
+    const [remitenteId, setRemitenteId] = useState(null);
     const [mensajeError, setMensajeError] = useState("");
 
     const redirectToPage = () => {
@@ -42,35 +38,61 @@ export function IngresoDatosRemitente() {
             return;
         }
 
-        // Primero, buscar si el remitente ya existe
-        const responseBuscar = await fetch(`http://127.0.0.1:5000/remitentes/buscar?rut=${rut_remitente}&direccion=${direccion_remitente}&correo=${correo}`);
-        
-        if (responseBuscar.ok) {
-            const dataRemitente = await responseBuscar.json();
-            // Remitente existe, usar su ID
-            console.log(dataRemitente.id)
-            setRemitenteId(dataRemitente.id);
-        } else if (responseBuscar.status === 404) {
-            // Cliente no encontrado, entonces crearlo
-            const responseCliente = await fetch(`http://127.0.0.1:5000/clientes/${rut_remitente}`);
-            const dataCliente = await responseCliente.json();
+        try {
+            // Primero, buscar si el remitente ya existe
+            let responseBuscar = await fetch(`http://127.0.0.1:5000/remitentes/buscar?rut=${rut_remitente}&direccion=${direccion_remitente}&correo=${correo}`);
+            
+            if (responseBuscar.ok) {
+                const dataRemitente = await responseBuscar.json();
+                setRemitenteId(dataRemitente.id);
+                navigate('/IngresoDatosDestinatario', { state: { remitenteId: dataRemitente.id } });
+            } else if (responseBuscar.status === 404) {
+                // Cliente no encontrado, entonces crearlo
+                let responseCliente = await fetch(`http://127.0.0.1:5000/clientes/${rut_remitente}`);
+                let dataCliente = await responseCliente.json();
 
-            if (responseCliente.status === 404) {
-                // Crea al cliente
-                const res = await fetch("http://127.0.0.1:5000/clientes", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        rut: rut_remitente,
-                        nombre: remitente
-                    }),
-                });
+                if (responseCliente.status === 404) {
+                    // Crea al cliente
+                    let res = await fetch("http://127.0.0.1:5000/clientes", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            rut: rut_remitente,
+                            nombre: remitente
+                        }),
+                    });
 
-                if (res.ok) {
-                    // Crear Remitente
-                    const resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
+                    if (res.ok) {
+                        // Crear Remitente
+                        let resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                rut_remitente: rut_remitente,
+                                correo: correo,
+                                direccion: direccion_remitente
+                            }),
+                        });
+
+                        if (resRemitente.ok) {
+                            // Buscar el remitente creado para obtener su ID
+                            responseBuscar = await fetch(`http://127.0.0.1:5000/remitentes/buscar?rut=${rut_remitente}&direccion=${direccion_remitente}&correo=${correo}`);
+                            const dataRemitente = await responseBuscar.json();
+                            setRemitenteId(dataRemitente.id);
+                            navigate('/IngresoDatosDestinatario', { state: { remitenteId: dataRemitente.id } });
+                        } else {
+                            console.error('Error al crear remitente:', await resRemitente.text());
+                        }
+                    } else {
+                        console.error('Error al crear el Cliente:', await res.text());
+                    }
+                } else {
+                    // Cliente existe, crear remitente
+                    let resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -83,36 +105,20 @@ export function IngresoDatosRemitente() {
                     });
 
                     if (resRemitente.ok) {
-                        const dataRemitente = await resRemitente.json();
-                        redirectToPage(dataRemitente.id);
+                        // Buscar el remitente creado para obtener su ID
+                        responseBuscar = await fetch(`http://127.0.0.1:5000/remitentes/buscar?rut=${rut_remitente}&direccion=${direccion_remitente}&correo=${correo}`);
+                        const dataRemitente = await responseBuscar.json();
+                        setRemitenteId(dataRemitente.id);
+                        navigate('/IngresoDatosDestinatario', { state: { remitenteId: dataRemitente.id } });
                     } else {
                         console.error('Error al crear remitente:', await resRemitente.text());
                     }
-                } else {
-                    console.error('Error al crear el Cliente:', await res.text());
                 }
             } else {
-                // Cliente existe, crear remitente
-                const resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        rut_remitente: rut_remitente,
-                        correo: correo,
-                        direccion: direccion_remitente
-                    }),
-                });
-
-                if (resRemitente.ok) {
-                    const dataRemitente = await resRemitente.json();
-                } else {
-                    console.error('Error al crear remitente:', await resRemitente.text());
-                }
+                console.error('Error al buscar remitente:', await responseBuscar.text());
             }
-        } else {
-            console.error('Error al buscar remitente:', await responseBuscar.text());
+        } catch (error) {
+            setMensajeError(error.message);
         }
     };
 
@@ -126,7 +132,7 @@ export function IngresoDatosRemitente() {
                     className="controls"
                     type="text"
                     value={rut_remitente}
-                    placeholder="Ingrese su nombre"
+                    placeholder="Ingrese su RUT"
                     onChange={(e) => setRut_remitente(e.target.value)}
                     id="nombre"
                     required

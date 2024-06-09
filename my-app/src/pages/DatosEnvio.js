@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
-
 import { useNavigate, useLocation } from 'react-router-dom';
 import "../Formulario/formularioCSS.css";
 import "../Formulario/ButtonStyle.css";
-import { BotonNavegar } from "../components/BotonNavegar"
+import { BotonNavegar } from "../components/BotonNavegar";
 import { BotonError } from "../components/BotonError";
 
 export function DatosEnvio() {
 
-    //Definicion useStates para paquete
+    // Definición de useStates para paquete
     const [tipo, setEs_sobre] = useState("");
-    const [peso, setPeso] = useState(0.0);
+    const [peso, setPeso] = useState(0.1);
 
-    //Definicion useStates para envio
+    // Definición de useStates para envío
     const [cod_postal, setCodigo_postal] = useState("");
     const [tipo_envio, setTipo_de_envio] = useState("");
     const [pagado, setPagado] = useState(false);
@@ -23,62 +22,76 @@ export function DatosEnvio() {
     const [mensajeError, setMensajeError] = useState("");
 
     const navigate = useNavigate();
-    //funciones varias para el jsx
+    const location = useLocation();
+    const [id_remitente, setId_remitente] = useState(location.state?.remitenteId || "");
+    const [id_destinatario, setId_destinatario] = useState(location.state?.destinatarioId || "");
 
-    const redirectToPage = () => {
-        navigate('/IngresoDatosRemitente');
-    };
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const paqueteRes = await fetch("http://127.0.0.1:5000/paquetes", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                tipo,
-                peso: parseFloat(peso)
-            }),
-        });
+        try {
+            const paqueteRes = await fetch("http://127.0.0.1:5000/paquetes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    tipo,
+                    peso: parseFloat(peso)
+                }),
+            });
 
-        const envioRes = await fetch("http://127.0.0.1:5000/envios", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                cod_postal,
-                tipo_envio,
-                pagado,
-                recogida_a_domicilio,
-                reparto_a_domicilio,
-                por_pagar
-                /*id_paquete,
-                id_remitente:remitenteId,
-                id_destinatario:destinatarioId*/
-            }),
-        });
-        navigate('/IngresoDatosRemitente');
-    };
-    const handleViewJson = () => {
-        const data = {
-            tipo,
-            peso,
-            cod_postal,
-            tipo_envio,
-            pagado,
-            recogida_a_domicilio,
-            reparto_a_domicilio,
-            por_pagar
-        };
-        alert(JSON.stringify(data, null, 2));
-    };
+            if (!paqueteRes.ok) {
+                throw new Error("Error al crear el paquete");
+            }
 
+            const paqueteData = await paqueteRes.json();
+            const id_paquete = paqueteData.id_paquete;
+
+            const envioRes = await fetch("http://127.0.0.1:5000/envios", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    cod_postal,
+                    tipo_envio,
+                    pagado,
+                    recogida_a_domicilio,
+                    reparto_a_domicilio,
+                    por_pagar,
+                    id_paquete,
+                    id_remitente,
+                    id_destinatario,
+                }),
+            });
+
+            if (!envioRes.ok) {
+                throw new Error("Error al crear el envío");
+            }
+
+            navigate('/');
+        } catch (error) {
+            setMensajeError(error.message);
+        }
+    };
     return (
         <div>
-
-            <form className="form-register" id="div_envio" onSubmit={redirectToPage}>
+             <pre>
+                {JSON.stringify({
+                    tipo,
+                    peso: parseFloat(peso),
+                    cod_postal,
+                    tipo_envio,
+                    pagado,
+                    recogida_a_domicilio,
+                    reparto_a_domicilio,
+                    por_pagar,
+                    id_remitente,
+                    id_destinatario
+                }, null, 2)}
+            </pre>
+            <form className="form-register" id="div_envio" onSubmit={handleSubmit}>
                 <h4>Datos de envio</h4>
                 <label className="info_campo">Código postal</label>
                 <input
@@ -174,7 +187,7 @@ export function DatosEnvio() {
                     <option value="false">No</option>
                 </select>
                 <BotonError mensaje={mensajeError} />
-                <BotonNavegar paginaAntes="/IngresoDatosDestinatario" />
+                <BotonNavegar paginaAntes="/IngresoDatosDestinatario" botonSiguienteTexto ="Registrar"/>
 
             </form>
         </div>
