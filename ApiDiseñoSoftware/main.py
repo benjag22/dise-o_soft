@@ -1,9 +1,8 @@
-from cliente import Cliente
-from remitente import Remitente
-from destinatario import Destinatario
-from paquete import Paquete
-from envio import Envio
-from parametros import Parametros
+
+"""from ApiDiseñoSoftware.RemitenteAPI import Remitente
+from ApiDiseñoSoftware.DestinatarioAPI import Destinatario
+from ApiDiseñoSoftware.PaqueteAPI import Paquete
+from ApiDiseñoSoftware.EnvioAPI import Envio
 
 def main():
     cliente1 = Cliente("12345678-9", "Juan")
@@ -27,3 +26,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+"""
