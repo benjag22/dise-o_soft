@@ -8,7 +8,11 @@ import { BotonError } from "../components/BotonError";
 export function IngresoDatosRemitente() {
     const navigate = useNavigate();
     const [rut_remitente, setRut_remitente] = useState("")
-    const [remitente, setRemitente] = useState("");
+    const [nombreRemitente, setNombreRemitente] = useState("");
+    const [apellidoPaternoRemitente, setApellidoPaternoRemitente] = useState("");
+    const [apellidoMaternoRemitente, setApellidoMaternoRemitente] = useState("");
+
+
     const [correo, setEmail] = useState("");
     const [recogida_a_domicilio, setRecogidaADomicilio] = useState(false);
     const [direccion_remitente, setDireccion_recogida] = useState("");
@@ -127,24 +131,45 @@ export function IngresoDatosRemitente() {
             <form className="form-register" id="div_remitente" onSubmit={handleSubmit}>
                 <h2>Datos Remitente</h2>
 
-                <label className="info_campo" htmlFor="nombre">Ingrese su RUT</label>
+                <label className="info_campo" htmlFor="rut">Ingrese su RUT</label>
                 <input
                     className="controls"
                     type="text"
                     value={rut_remitente}
                     placeholder="Ingrese su RUT"
                     onChange={(e) => setRut_remitente(e.target.value)}
-                    id="nombre"
+                    id="rut"
                     required
                 />
-                <label className="info_campo" htmlFor="nombre">Nombre completo</label>
+                <label className="info_campo" htmlFor="nombre">Nombre</label>
                 <input
                     className="controls"
                     type="text"
-                    value={remitente}
+                    value={nombreRemitente}
                     placeholder="Ingrese su nombre"
                     onChange={(e) => setRemitente(e.target.value)}
                     id="nombre"
+                    required
+                />
+
+                <label className="info_campo" htmlFor="Apellido paterno">Apellido paterno</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={apellidoPaternoRemitente}
+                    placeholder="Ingrese su Apellido paterno"
+                    onChange={(e) => setRemitente(e.target.value)}
+                    id="Apellido paterno"
+                    required
+                />
+                <label className="info_campo" htmlFor="Apellido materno">Apellido materno</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={apellidoMaternoRemitente}
+                    placeholder="Ingrese su Apellido materno"
+                    onChange={(e) => setRemitente(e.target.value)}
+                    id="Apellido materno"
                     required
                 />
                 <label className="info_campo" htmlFor="correo">Correo electronico</label>
