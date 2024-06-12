@@ -1,74 +1,77 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import GetDetalleEnvio from './GetDetalleEnvio';
-import './DetallesEnvioStyles.css';
+import "./DetallesEnvioStyles.css";
 
-const DetallesEnvio = () => {
-  const { id } = useParams();
+const DetalleEnvio = () => {
+  const { envioId } = useParams();
   const [envio, setEnvio] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchEnvioDetails = async () => {
-      const envioData = await GetDetalleEnvio(id);
-      setEnvio(envioData);
+    const fetchEnvio = async () => {
+      try {
+        const envioData = await GetDetalleEnvio(envioId);
+        if (envioData) {
+          setEnvio(envioData);
+        } else {
+          setError('No se encontraron detalles del envío');
+        }
+      } catch (error) {
+        setError('Error al cargar los detalles del envío');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchEnvioDetails();
-  }, [id]);
+    fetchEnvio();
+  }, [envioId]);
 
-  const actualizarEstado = async () => {
-    const siguienteEstado = obtenerSiguienteEstado(envio.estado);
-    const response = await fetch(`http://127.0.0.1:4000/envios/${id}/estado`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ estado: siguienteEstado }),
-    });
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-    if (response.ok) {
-      setEnvio({ ...envio, estado: siguienteEstado });
-    } else {
-      alert('Error al actualizar el estado del envío');
-    }
-  };
-
-  const obtenerSiguienteEstado = (estadoActual) => {
-    const estados = ['en preparación', 'en transito', 'en sucursal', 'en reparto', 'entregado'];
-    const indiceActual = estados.indexOf(estadoActual);
-    return indiceActual < estados.length - 1 ? estados[indiceActual + 1] : estadoActual;
-  };
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   if (!envio) {
-    return <div>No se encontró el envío</div>;
+    return <div>No se encontraron detalles del envío</div>;
   }
 
   return (
-    <div className="detalles-envio-container">
-      <h1>Detalles del Envío</h1>
-      <p><strong>Número de Envío:</strong> {envio.id}</p>
-      <p><strong>Remitente:</strong> {envio.remitente}</p>
-      <p><strong>Destinatario:</strong> {envio.destinatario}</p>
-      <p><strong>Teléfono:</strong> {envio.fono}</p>
-      <p><strong>Dirección de Envío:</strong> {envio.direccionEnvio}</p>
-      <p><strong>Ciudad:</strong> {envio.ciudad}</p>
-      <p><strong>Tipo de Envío:</strong> {envio.tipoEnvio}</p>
-      <p><strong>Correo:</strong> {envio.correo}</p>
-      <p><strong>Por Pagar:</strong> {envio.porPagar ? 'Sí' : 'No'}</p>
-      <p><strong>Fecha de Recepción:</strong> {envio.fechaRecepcion}</p>
-      <p><strong>Código Postal:</strong> {envio.codigoPostal}</p>
-      <p><strong>Es Sobre:</strong> {envio.esSobre ? 'Sí' : 'No'}</p>
-      <p><strong>Peso:</strong> {envio.peso} kg</p>
-      <p><strong>Recogida a Domicilio:</strong> {envio.recogidaADomicilio ? 'Sí' : 'No'}</p>
-      <p><strong>Dirección del Remitente:</strong> {envio.direccionRemitente}</p>
-      <p><strong>Reparto a Domicilio:</strong> {envio.repartoADomicilio ? 'Sí' : 'No'}</p>
-      <p><strong>RUT Destinatario:</strong> {envio.rutDestinatario}</p>
-      <p><strong>Pagado:</strong> {envio.pagado ? 'Sí' : 'No'}</p>
-      <p><strong>Entregado:</strong> {envio.entregado ? 'Sí' : 'No'}</p>
-      <p><strong>Estado:</strong> {envio.estado}</p>
-      <button onClick={actualizarEstado}>Actualizar Estado</button>
+    <div className="detalle-envio-container">
+      <h1>Detalle del Envío</h1>
+      <div className="envio-info">
+        <p><strong>ID Envío:</strong> {envio.id_envio}</p>
+        <p><strong>Estado:</strong> {envio.estado}</p>
+        <p><strong>Tipo de Envío:</strong> {envio.tipo_envio}</p>
+        <p><strong>Código Postal:</strong> {envio.codigo_postal}</p>
+        <p><strong>Fecha de Recepción:</strong> {envio.fecha_recepcion}</p>
+        <p><strong>Reparto a Domicilio:</strong> {envio.reparto_a_domicilio}</p>
+        <p><strong>Pagado:</strong> {envio.pagado ? 'Sí' : 'No'}</p>
+        <h2>Paquete</h2>
+        <p><strong>ID Paquete:</strong> {envio.paquete.id_paquete}</p>
+        <p><strong>Tipo:</strong> {envio.paquete.tipo}</p>
+        <p><strong>Peso:</strong> {envio.paquete.peso} kg</p>
+        <p><strong>Fecha de Ingreso:</strong> {envio.paquete.fecha_ingreso}</p>
+        <h2>Remitente</h2>
+        <p><strong>Nombre:</strong> {envio.remitente.nombre}</p>
+        <p><strong>RUT:</strong> {envio.remitente.rut_remitente}</p>
+        <p><strong>Dirección:</strong> {envio.remitente.direccion}</p>
+        <p><strong>Correo:</strong> {envio.remitente.correo}</p>
+        <h2>Destinatario</h2>
+        <p><strong>Nombre:</strong> {envio.destinatario.nombre}</p>
+        <p><strong>RUT:</strong> {envio.destinatario.rut_destinatario}</p>
+        <p><strong>Teléfono:</strong> {envio.destinatario.telefono}</p>
+        <p><strong>Dirección:</strong> {envio.destinatario.direccion}</p>
+        <p><strong>Correo:</strong> {envio.destinatario.correo}</p>
+      </div>
+      <button onClick={() => navigate(-1)}>Volver</button>
     </div>
   );
 };
 
-export default DetallesEnvio;
+export default DetalleEnvio;

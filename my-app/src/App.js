@@ -5,7 +5,7 @@ import EnviosComponent from './Otros/EnviosComponent ';
 import { IngresoDatosRemitente } from './pages/IngresoDatosRemitente';
 import { IngresoDatosDestinatario } from './pages/IngresoDatosDestinatario';
 import { DatosEnvio } from './pages/DatosEnvio';
-import DetallesEnvio from './Otros/DetallesEnvio'
+import DetalleEnvio from './Otros/DetallesEnvio';
 import { NavBar } from './components/NavBar';
 function App() {
     return (
@@ -15,7 +15,7 @@ function App() {
           <Route path='/' element={<Home/>}/>
           <Route path='/enviosPorPagar' element={<EnviosComponent/>}/>
           <Route path='/IngresoDatosRemitente' element={<IngresoDatosRemitente/>}/>
-          <Route path='/detalle-envio/:id' element={<DetallesEnvio/>}/>
+          <Route path="/detalle-envio/:envioId" element={<DetalleEnvio />} />
           <Route path='/IngresoDatosDestinatario' element={<IngresoDatosDestinatario/>}/>
           <Route path='/IngresoDatosDeEnvio' element={<DatosEnvio/>}/>
         </Routes>

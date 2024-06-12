@@ -1,11 +1,15 @@
 const GetDetalleEnvio = async (envioId) => {
-    const response = await fetch(`http://127.0.0.1:4000/detalle_envio/${envioId}`);
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/envios/${envioId}`);
     if (!response.ok) {
-      throw new Error('error: ');
+      throw new Error('Error al obtener los detalles del envío');
     }
     const data = await response.json();
     return data;
-  };
-  
-  export default GetDetalleEnvio;
-  
+  } catch (error) {
+    console.error('Error en la solicitud de detalles del envío:', error);
+    return null;
+  }
+};
+
+export default GetDetalleEnvio;

@@ -347,91 +347,105 @@ def create_envio():
     return jsonify({'message': 'Nuevo envío creado', 'id_envio': nuevo_envio.id}), 201
 
 
-@app.route('/envios/<int:id>', methods=['GET'])
-def get_envio(id):
-    envio = Envio.query.get(id)
-    if not envio:
-        return jsonify({'message': 'No se encontró el envío'}), 404
+@app.route('/envios/<int:envio_id>', methods=['GET'])
+def get_envio_by_id(envio_id):
+    try:
+        envio = Envio.query.get(envio_id)
+        if not envio:
+            return jsonify({'error': 'Envío no encontrado'}), 404
 
-    paquete = Paquete.query.get(envio.id_paquete)
-    remitente = Remitente.query.get(envio.id_remitente)
-    destinatario = Destinatario.query.get(envio.id_destinatario)
-
-    return jsonify({
-        'id_envio': envio.id,
-        'estado': envio.estado,
-        'recogida_a_domicilio': envio.recogida_a_domicilio,
-        'por_pagar': envio.por_pagar,
-        'tipo_envio': envio.tipo_envio,
-        'codigo_postal': envio.codigo_postal,
-        'fecha_recepcion': envio.fecha_recepcion,
-        'reparto_a_domicilio': envio.reparto_a_domicilio,
-        'pagado': envio.pagado,
-        'paquete': {
-            'id_paquete': paquete.id,
-            'tipo': paquete.tipo,
-            'peso': float(paquete.peso),
-            'fecha_ingreso': paquete.fecha_ingreso
-        },
-        'remitente': {
-            'id_remitente': remitente.id,
-            'rut_remitente': remitente.rut_remitente,
-            'telefono': remitente.telefono,
-            'direccion': remitente.direccion,
-            'correo': remitente.correo
-        },
-        'destinatario': {
-            'id_destinatario': destinatario.id,
-            'rut_destinatario': destinatario.rut_destinatario,
-            'telefono': destinatario.telefono,
-            'direccion': destinatario.direccion,
-            'correo': destinatario.correo
-        }
-    }), 200
-
-@app.route('/envios/por_pagar', methods=['GET'])
-def get_envios_por_pagar():
-    envios_por_pagar = Envio.query.filter_by(por_pagar=True).all()
-
-    resultados = []
-    for envio in envios_por_pagar:
         paquete = Paquete.query.get(envio.id_paquete)
         remitente = Remitente.query.get(envio.id_remitente)
         destinatario = Destinatario.query.get(envio.id_destinatario)
+        nombre_remitente = Cliente.query.get(remitente.rut_remitente)
+        nombre_destinatario = Cliente.query.get(destinatario.rut_destinatario)
 
-        resultados.append({
+        resultado = {
             'id_envio': envio.id,
             'estado': envio.estado,
             'recogida_a_domicilio': envio.recogida_a_domicilio,
             'por_pagar': envio.por_pagar,
             'tipo_envio': envio.tipo_envio,
             'codigo_postal': envio.codigo_postal,
-            'fecha_recepcion': envio.fecha_recepcion.isoformat() if envio.fecha_recepcion else None, 
+            'fecha_recepcion': envio.fecha_recepcion.isoformat() if envio.fecha_recepcion else None,
             'reparto_a_domicilio': envio.reparto_a_domicilio.isoformat() if envio.reparto_a_domicilio else None,
             'pagado': envio.pagado,
             'paquete': {
                 'id_paquete': paquete.id,
                 'tipo': paquete.tipo,
-                'peso': float(paquete.peso) if paquete.peso else None, 
-                'fecha_ingreso': paquete.fecha_ingreso.isoformat() if paquete.fecha_ingreso else None 
+                'peso': float(paquete.peso) if paquete.peso else None,
+                'fecha_ingreso': paquete.fecha_ingreso.isoformat() if paquete.fecha_ingreso else None
             },
             'remitente': {
                 'id_remitente': remitente.id,
                 'rut_remitente': remitente.rut_remitente,
-                'telefono': remitente.telefono,
+                'nombre': nombre_remitente.nombre if nombre_remitente else None,
                 'direccion': remitente.direccion,
                 'correo': remitente.correo
             },
             'destinatario': {
                 'id_destinatario': destinatario.id,
                 'rut_destinatario': destinatario.rut_destinatario,
+                'nombre': nombre_destinatario.nombre if nombre_destinatario else None,
                 'telefono': destinatario.telefono,
                 'direccion': destinatario.direccion,
                 'correo': destinatario.correo
             }
-        })
+        }
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-    return jsonify(resultados)
+@app.route('/envios/por_pagar', methods=['GET'])
+def get_envios_por_pagar():
+    try:
+        envios_por_pagar = Envio.query.filter_by(por_pagar=True).all()
+
+        resultados = []
+        for envio in envios_por_pagar:
+            paquete = Paquete.query.get(envio.id_paquete)
+            remitente = Remitente.query.get(envio.id_remitente)
+            destinatario = Destinatario.query.get(envio.id_destinatario)
+            nombre_remitente = Cliente.query.get(remitente.rut_remitente)
+            nombre_destinatario = Cliente.query.get(destinatario.rut_destinatario)
+
+            resultados.append({
+                'id_envio': envio.id,
+                'estado': envio.estado,
+                'recogida_a_domicilio': envio.recogida_a_domicilio,
+                'por_pagar': envio.por_pagar,
+                'tipo_envio': envio.tipo_envio,
+                'codigo_postal': envio.codigo_postal,
+                'fecha_recepcion': envio.fecha_recepcion.isoformat() if envio.fecha_recepcion else None,
+                'reparto_a_domicilio': envio.reparto_a_domicilio.isoformat() if envio.reparto_a_domicilio else None,
+                'pagado': envio.pagado,
+                'paquete': {
+                    'id_paquete': paquete.id,
+                    'tipo': paquete.tipo,
+                    'peso': float(paquete.peso) if paquete.peso else None,
+                    'fecha_ingreso': paquete.fecha_ingreso.isoformat() if paquete.fecha_ingreso else None
+                },
+                'remitente': {
+                    'id_remitente': remitente.id,
+                    'rut_remitente': remitente.rut_remitente,
+                    'nombre': nombre_remitente.nombre if nombre_remitente else None,
+                    'direccion': remitente.direccion,
+                    'correo': remitente.correo
+                },
+                'destinatario': {
+                    'id_destinatario': destinatario.id,
+                    'rut_destinatario': destinatario.rut_destinatario,
+                    'nombre': nombre_destinatario.nombre if nombre_destinatario else None,
+                    'telefono': destinatario.telefono,
+                    'direccion': destinatario.direccion,
+                    'correo': destinatario.correo
+                }
+            })
+
+        return jsonify(resultados)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 with app.app_context():
     db.create_all()
