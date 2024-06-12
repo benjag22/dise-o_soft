@@ -31,7 +31,7 @@ export function IngresoDatosRemitente() {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         if (!validarCorreo(correo)) {
             setMensajeError("Por favor, ingrese un correo electrónico válido.");
             return;
@@ -40,7 +40,7 @@ export function IngresoDatosRemitente() {
             setMensajeError("Por favor, ingrese un RUT válido.");
             return;
         }
-
+    
         try {
             // Primero, buscar si el remitente ya existe
             let responseBuscar = await fetch(`http://127.0.0.1:5000/remitentes/buscar?rut=${rut_remitente}&direccion=${direccion_remitente}&correo=${correo}`);
@@ -53,7 +53,7 @@ export function IngresoDatosRemitente() {
                 // Cliente no encontrado, entonces crearlo
                 let responseCliente = await fetch(`http://127.0.0.1:5000/clientes/${rut_remitente}`);
                 let dataCliente = await responseCliente.json();
-
+    
                 if (responseCliente.status === 404) {
                     // Crea al cliente
                     let res = await fetch("http://127.0.0.1:5000/clientes", {
@@ -63,10 +63,13 @@ export function IngresoDatosRemitente() {
                         },
                         body: JSON.stringify({
                             rut: rut_remitente,
-                            nombre: remitente
+                            nombre: nombreRemitente, // Cambia de 'no' a 'nombreRemitente'
+                            ap_paterno: apellidoPaternoRemitente, // Ajusta según tu nuevo modelo
+                            ap_materno: apellidoMaternoRemitente, // Ajusta según tu nuevo modelo
+                            estado: 'activo' // Ajusta según tu nuevo modelo
                         }),
                     });
-
+    
                     if (res.ok) {
                         // Crear Remitente
                         let resRemitente = await fetch("http://127.0.0.1:5000/remitentes", {
@@ -80,7 +83,7 @@ export function IngresoDatosRemitente() {
                                 direccion: direccion_remitente
                             }),
                         });
-
+    
                         if (resRemitente.ok) {
                             // Buscar el remitente creado para obtener su ID
                             responseBuscar = await fetch(`http://127.0.0.1:5000/remitentes/buscar?rut=${rut_remitente}&direccion=${direccion_remitente}&correo=${correo}`);
@@ -106,7 +109,7 @@ export function IngresoDatosRemitente() {
                             direccion: direccion_remitente
                         }),
                     });
-
+    
                     if (resRemitente.ok) {
                         // Buscar el remitente creado para obtener su ID
                         responseBuscar = await fetch(`http://127.0.0.1:5000/remitentes/buscar?rut=${rut_remitente}&direccion=${direccion_remitente}&correo=${correo}`);
@@ -124,6 +127,7 @@ export function IngresoDatosRemitente() {
             setMensajeError(error.message);
         }
     };
+    
 
     return (
         <>
@@ -146,7 +150,7 @@ export function IngresoDatosRemitente() {
                     type="text"
                     value={nombreRemitente}
                     placeholder="Ingrese su nombre"
-                    onChange={(e) => setRemitente(e.target.value)}
+                    onChange={(e) => setNombreRemitente(e.target.value)}
                     id="nombre"
                     required
                 />
@@ -157,7 +161,7 @@ export function IngresoDatosRemitente() {
                     type="text"
                     value={apellidoPaternoRemitente}
                     placeholder="Ingrese su apellido paterno"
-                    onChange={(e) => setRemitente(e.target.value)}
+                    onChange={(e) => setApellidoPaternoRemitente(e.target.value)}
                     id="Apellido paterno"
                     required
                 />
@@ -167,7 +171,7 @@ export function IngresoDatosRemitente() {
                     type="text"
                     value={apellidoMaternoRemitente}
                     placeholder="Ingrese su Apellido materno"
-                    onChange={(e) => setRemitente(e.target.value)}
+                    onChange={(e) => setApellidoMaternoRemitente(e.target.value)}
                     id="Apellido materno"
                     required
                 />
@@ -181,9 +185,6 @@ export function IngresoDatosRemitente() {
                     id="correo"
                     required
                 />
-                <label className="info_campo" htmlFor="direccionRecogida">
-                    Recogida a domicilio
-                </label>
                 <label className="info_campo">Ingrese su dirección</label>
                 <input
                     className="controls"

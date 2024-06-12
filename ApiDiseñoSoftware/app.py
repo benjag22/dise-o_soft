@@ -111,7 +111,7 @@ def create_cliente():
 
 @app.route('/clientes/<rut>', methods=['GET'])
 def get_cliente(rut):
-    cliente = Cliente.query.get(rut)
+    cliente = Cliente.query.filter_by(rut=rut).first()
     if not cliente:
         return jsonify({'message': 'No se encontró el cliente'}), 404
     return jsonify({
@@ -161,12 +161,13 @@ def buscar_remitente():
     direccion = request.args.get('direccion')
     correo = request.args.get('correo')
     
-    if not rut and not direccion and not correo:
+    if not rut or not direccion or not correo:
         return jsonify({'message': 'Faltan datos'}), 400
 
+    # Utilizar filter en lugar de filter_by para aplicar múltiples condiciones
     remitente = Remitente.query.filter(
-        (Remitente.rut_remitente == rut) | 
-        (Remitente.direccion == direccion) |
+        (Remitente.rut_remitente == rut) & 
+        (Remitente.direccion == direccion) &
         (Remitente.correo == correo)
     ).first()
 
@@ -179,6 +180,7 @@ def buscar_remitente():
         'correo': remitente.correo,
         'direccion': remitente.direccion
     }), 200
+
 
 # Endpoint para crear un destinatario
 @app.route('/destinatarios', methods=['POST'])
@@ -222,12 +224,13 @@ def buscar_destinatario():
     direccion = request.args.get('direccion')
     telefono = request.args.get('telefono')
     
-    if not rut and not direccion and not telefono:
+    if not rut or not direccion or not telefono:
         return jsonify({'message': 'Faltan datos'}), 400
 
+    # Utilizar filter en lugar de filter_by para aplicar múltiples condiciones
     destinatario = Destinatario.query.filter(
-        (Destinatario.rut_destinatario == rut) | 
-        (Destinatario.direccion == direccion) |
+        (Destinatario.rut_destinatario == rut) & 
+        (Destinatario.direccion == direccion) &
         (Destinatario.telefono == telefono)
     ).first()
 
@@ -242,82 +245,106 @@ def buscar_destinatario():
         'correo': destinatario.correo
     }), 200
 
+@app.route('/paquetes/buscar', methods=['GET'])
+def buscar_paquete():
+    tipo = request.args.get('tipo')
+    peso = request.args.get('peso')
+    
+    if not tipo or not peso:
+        return jsonify({'message': 'Faltan datos'}), 400
 
-@app.route('/paquetes/<int:id>', methods=['GET'])
-def get_paquete(id):
-    paquete = Paquete.query.get(id)
+    # Utilizar filter en lugar de filter_by para aplicar múltiples condiciones
+    paquete = Paquete.query.filter(
+        (Paquete.tipo == tipo) & 
+        (Paquete.peso == peso)
+    ).first()
+
     if not paquete:
-        return jsonify({'message': 'No se encontró el paquete'}), 404
+        return jsonify({'message': 'No se encontró ningún paquete con esos datos'}), 404
+
     return jsonify({
         'id_paquete': paquete.id,
         'tipo': paquete.tipo,
         'peso': float(paquete.peso),
         'fecha_ingreso': paquete.fecha_ingreso
-    })
+    }), 200
+
 
 @app.route('/paquetes', methods=['POST'])
 def create_paquete():
     data = request.get_json()
-    if not data or not 'tipo' in data or not 'peso' in data:
-        return jsonify({'message': 'Datos inválidos'}), 400
 
-    if data['tipo'] not in ['sobre', 'encomienda']:
-        return jsonify({'message': 'Tipo de paquete inválido'}), 400
+    if not data or 'tipo' not in data or 'peso' not in data:
+        return jsonify({'message': 'Datos inválidos. Se requiere "tipo" y "peso".'}), 400
 
-    if data['peso'] <= 0:
-        return jsonify({'message': 'El peso debe ser mayor a 0'}), 400
+    tipo = data['tipo']
+    peso = data['peso']
 
-    new_paquete = Paquete(
-        tipo=data['tipo'],
-        peso=data['peso'],
-        fecha_ingreso=datetime.utcnow()  # Agregar la fecha de ingreso al crear el paquete
-    )
-    db.session.add(new_paquete)
+    if tipo not in ['sobre', 'encomienda']:
+        return jsonify({'message': 'Tipo de paquete inválido. Debe ser "sobre" o "encomienda".'}), 400
+
+    if not isinstance(peso, (int, float)) or peso <= 0:
+        return jsonify({'message': 'Peso inválido. Debe ser un número mayor que 0.'}), 400
+
+    nuevo_paquete = Paquete(tipo=tipo, peso=peso, fecha_ingreso=datetime.utcnow())
+    db.session.add(nuevo_paquete)
     db.session.commit()
-    return jsonify({'message': 'Nuevo paquete creado', 'id_paquete': new_paquete.id}), 201
 
+    return jsonify({'message': 'Nuevo paquete creado', 'id_paquete': nuevo_paquete.id}), 201
 
-# Endpoint para crear un envío
+@app.route('/paquetes/<int:id_paquete>', methods=['GET'])
+def get_paquete(id_paquete):
+    paquete = Paquete.query.get_or_404(id_paquete)
+    return jsonify({
+        'id': paquete.id,
+        'tipo': paquete.tipo,
+        'peso': float(paquete.peso),  # Convertir Decimal a float
+        'fecha_ingreso': paquete.fecha_ingreso.isoformat()
+    })
+
 @app.route('/envios', methods=['POST'])
 def create_envio():
     data = request.get_json()
-    
-    required_fields = ['codigo_postal', 'tipo_envio', 'pagado', 'recogida_a_domicilio', 'por_pagar', 'id_paquete', 'id_remitente', 'id_destinatario']
+
+    required_fields = [
+        "codigo_postal", "tipo_envio", "pagado", "recogida_a_domicilio",
+        "por_pagar", "id_paquete", "id_remitente", "id_destinatario"
+    ]
     for field in required_fields:
         if field not in data:
-            return jsonify({'message': f'Falta el campo {field}'}), 400
+            print(f'Falta el campo "{field}"')
+            return jsonify({'message': f'Falta el campo "{field}"'}), 400
 
     if data['tipo_envio'] not in ['entrega en el día', 'entrega rápida', 'entrega normal']:
+        print('Tipo de envío inválido')
         return jsonify({'message': 'Tipo de envío inválido'}), 400
 
-    # Comprobamos que las claves foráneas existan
-    paquete = Paquete.query.get(data['id_paquete'])
-    remitente = Remitente.query.get(data['id_remitente'])
-    destinatario = Destinatario.query.get(data['id_destinatario'])
+    for field in ["id_paquete", "id_remitente", "id_destinatario"]:
+        if not isinstance(data[field], int):
+            print(f'El campo "{field}" debe ser un entero')
+            return jsonify({'message': f'El campo "{field}" debe ser un entero'}), 400
 
-    if not paquete:
-        return jsonify({'message': 'No se encontró el paquete'}), 404
-    if not remitente:
-        return jsonify({'message': 'No se encontró el remitente'}), 404
-    if not destinatario:
-        return jsonify({'message': 'No se encontró el destinatario'}), 404
+    for field in ["pagado", "recogida_a_domicilio", "por_pagar"]:
+        if not isinstance(data[field], bool):
+            print(f'El campo "{field}" debe ser un booleano')
+            return jsonify({'message': f'El campo "{field}" debe ser un booleano'}), 400
 
-    new_envio = Envio(
+    nuevo_envio = Envio(
         codigo_postal=data['codigo_postal'],
         tipo_envio=data['tipo_envio'],
         pagado=data['pagado'],
-        estado='en preparación',  # Estado inicial
         recogida_a_domicilio=data['recogida_a_domicilio'],
-        fecha_recepcion=datetime.utcnow(),
-        reparto_a_domicilio=data.get('reparto_a_domicilio'),  # Puede ser opcional
         por_pagar=data['por_pagar'],
         id_paquete=data['id_paquete'],
         id_remitente=data['id_remitente'],
-        id_destinatario=data['id_destinatario']
+        id_destinatario=data['id_destinatario'],
+        estado='en preparación', 
+        fecha_recepcion=datetime.utcnow()
     )
-    db.session.add(new_envio)
+    db.session.add(nuevo_envio)
     db.session.commit()
-    return jsonify({'message': 'Nuevo envío creado', 'id_envio': new_envio.id}), 201
+
+    return jsonify({'message': 'Nuevo envío creado', 'id_envio': nuevo_envio.id}), 201
 
 
 @app.route('/envios/<int:id>', methods=['GET'])
@@ -362,6 +389,49 @@ def get_envio(id):
         }
     }), 200
 
+@app.route('/envios/por_pagar', methods=['GET'])
+def get_envios_por_pagar():
+    envios_por_pagar = Envio.query.filter_by(por_pagar=True).all()
+
+    resultados = []
+    for envio in envios_por_pagar:
+        paquete = Paquete.query.get(envio.id_paquete)
+        remitente = Remitente.query.get(envio.id_remitente)
+        destinatario = Destinatario.query.get(envio.id_destinatario)
+
+        resultados.append({
+            'id_envio': envio.id,
+            'estado': envio.estado,
+            'recogida_a_domicilio': envio.recogida_a_domicilio,
+            'por_pagar': envio.por_pagar,
+            'tipo_envio': envio.tipo_envio,
+            'codigo_postal': envio.codigo_postal,
+            'fecha_recepcion': envio.fecha_recepcion.isoformat() if envio.fecha_recepcion else None, 
+            'reparto_a_domicilio': envio.reparto_a_domicilio.isoformat() if envio.reparto_a_domicilio else None,
+            'pagado': envio.pagado,
+            'paquete': {
+                'id_paquete': paquete.id,
+                'tipo': paquete.tipo,
+                'peso': float(paquete.peso) if paquete.peso else None, 
+                'fecha_ingreso': paquete.fecha_ingreso.isoformat() if paquete.fecha_ingreso else None 
+            },
+            'remitente': {
+                'id_remitente': remitente.id,
+                'rut_remitente': remitente.rut_remitente,
+                'telefono': remitente.telefono,
+                'direccion': remitente.direccion,
+                'correo': remitente.correo
+            },
+            'destinatario': {
+                'id_destinatario': destinatario.id,
+                'rut_destinatario': destinatario.rut_destinatario,
+                'telefono': destinatario.telefono,
+                'direccion': destinatario.direccion,
+                'correo': destinatario.correo
+            }
+        })
+
+    return jsonify(resultados)
 
 with app.app_context():
     db.create_all()

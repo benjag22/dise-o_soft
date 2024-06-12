@@ -10,7 +10,8 @@ export function IngresoDatosDestinatario() {
     const [apellidoPaternoDestinatario, setapellidoPaternoDestinatario] = useState("");
     const [apellidoMaternoDestinatario, setapellidoMaternoDestinatario] = useState("");
     const [rutDestinatario, setRutDestinatario] = useState("");
-    const [fono, setFono] = useState("");
+    const [telefono, setFono] = useState("");
+    const [correo, setCorreo] = useState("")
     const [direccion, setDireccion] = useState("");
     const [mensajeError, setMensajeError] = useState("");
 
@@ -28,22 +29,31 @@ export function IngresoDatosDestinatario() {
         return regex.test(fono);
 
     }
+    const validarCorreo = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!validarCorreo(correo)) {
+            setMensajeError("Por favor, ingrese un correo electrónico válido.");
+            return;
+        }
+    
         if (!validarRut(rutDestinatario)) {
             setMensajeError("Por favor, ingrese un RUT válido.");
             return;
         }
-        if (!validarTelefono(fono)) {
+        if (!validarTelefono(telefono)) {
             setMensajeError("Por favor, ingrese un teléfono válido.");
             return;
         }
-
+    
         try {
             // Primero, buscar si el destinatario ya existe
-            let responseBuscar = await fetch(`http://127.0.0.1:5000/destinatarios/buscar?rut=${rutDestinatario}&direccion=${direccion}&telefono=${fono}`);
+            let responseBuscar = await fetch(`http://127.0.0.1:5000/destinatarios/buscar?rut=${rutDestinatario}&direccion=${direccion}&telefono=${telefono}&correo=${correo}`);
             
             if (responseBuscar.ok) {
                 const dataDestinatario = await responseBuscar.json();
@@ -52,7 +62,7 @@ export function IngresoDatosDestinatario() {
                 // Cliente no encontrado, entonces crearlo
                 let responseCliente = await fetch(`http://127.0.0.1:5000/clientes/${rutDestinatario}`);
                 let dataCliente = await responseCliente.json();
-
+    
                 if (responseCliente.status === 404) {
                     // Crear cliente
                     let res = await fetch("http://127.0.0.1:5000/clientes", {
@@ -62,10 +72,13 @@ export function IngresoDatosDestinatario() {
                         },
                         body: JSON.stringify({
                             rut: rutDestinatario,
-                            nombre: destinatario
+                            nombre: nombreDestinatario,
+                            ap_paterno: apellidoPaternoDestinatario,
+                            ap_materno: apellidoMaternoDestinatario,
+                            estado: 'activo'
                         }),
                     });
-
+    
                     if (res.ok) {
                         // Crear destinatario
                         let resDestinatario = await fetch("http://127.0.0.1:5000/destinatarios", {
@@ -75,14 +88,15 @@ export function IngresoDatosDestinatario() {
                             },
                             body: JSON.stringify({
                                 rut_destinatario: rutDestinatario,
-                                telefono: fono,
-                                direccion: direccion
+                                telefono: telefono,
+                                direccion: direccion,
+                                correo: correo 
                             }),
                         });
-
+    
                         if (resDestinatario.ok) {
                             // Buscar el destinatario creado para obtener su ID
-                            responseBuscar = await fetch(`http://127.0.0.1:5000/destinatarios/buscar?rut=${rutDestinatario}&direccion=${direccion}&telefono=${fono}`);
+                            responseBuscar = await fetch(`http://127.0.0.1:5000/destinatarios/buscar?rut=${rutDestinatario}&direccion=${direccion}&telefono=${telefono}&correo=${correo}`);
                             const dataDestinatario = await responseBuscar.json();
                             navigate('/IngresoDatosDeEnvio', { state: { remitenteId, destinatarioId: dataDestinatario.id } });
                         } else {
@@ -100,14 +114,15 @@ export function IngresoDatosDestinatario() {
                         },
                         body: JSON.stringify({
                             rut_destinatario: rutDestinatario,
-                            telefono: fono,
-                            direccion: direccion
+                            telefono: telefono,
+                            direccion: direccion,
+                            correo: correo // Este campo puede agregarlo si es necesario
                         }),
                     });
-
+    
                     if (resDestinatario.ok) {
                         // Buscar el destinatario creado para obtener su ID
-                        responseBuscar = await fetch(`http://127.0.0.1:5000/destinatarios/buscar?rut=${rutDestinatario}&direccion=${direccion}&telefono=${fono}`);
+                        responseBuscar = await fetch(`http://127.0.0.1:5000/destinatarios/buscar?rut=${rutDestinatario}&direccion=${direccion}&telefono=${telefono}&correo=${correo}`);
                         const dataDestinatario = await responseBuscar.json();
                         navigate('/IngresoDatosDeEnvio', { state: { remitenteId, destinatarioId: dataDestinatario.id } });
                     } else {
@@ -121,8 +136,7 @@ export function IngresoDatosDestinatario() {
             setMensajeError(error.message);
         }
     };
-
-
+    
     return (
         <form className="form-register" id="div_envio" onSubmit={handleSubmit}>
             <h4>Datos del destinatario</h4>
@@ -132,7 +146,7 @@ export function IngresoDatosDestinatario() {
                     type="text"
                     value={nombreDestinatario}
                     placeholder="Ingrese su nombre"
-                    onChange={(e) => setRemitente(e.target.value)}
+                    onChange={(e) => setnombreDestinatario(e.target.value)}
                     id="nombre"
                     required
                 />
@@ -143,7 +157,7 @@ export function IngresoDatosDestinatario() {
                     type="text"
                     value={apellidoPaternoDestinatario}
                     placeholder="Ingrese su apellido paterno"
-                    onChange={(e) => setRemitente(e.target.value)}
+                    onChange={(e) => setapellidoPaternoDestinatario(e.target.value)}
                     id="Apellido paterno"
                     required
                 />
@@ -153,7 +167,7 @@ export function IngresoDatosDestinatario() {
                     type="text"
                     value={apellidoMaternoDestinatario}
                     placeholder="Ingrese su Apellido materno"
-                    onChange={(e) => setRemitente(e.target.value)}
+                    onChange={(e) => setapellidoMaternoDestinatario(e.target.value)}
                     id="Apellido materno"
                     required
                 />
@@ -172,10 +186,20 @@ export function IngresoDatosDestinatario() {
             <input
                 className="controls"
                 type="text"
-                value={fono}
+                value={telefono}
                 placeholder="Numero de telefono"
                 onChange={(e) => setFono(e.target.value)}
                 id="fono_remitente"
+                required
+            />
+            <label className="info_campo" htmlFor="correo">Correo</label>
+            <input
+                className="controls"
+                type="text"
+                value={correo}
+                placeholder="Ingrese correo"
+                onChange={(e) => setCorreo(e.target.value)}
+                id="direccion"
                 required
             />
             <label className="info_campo" htmlFor="direccion">Dirección</label>

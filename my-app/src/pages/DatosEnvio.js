@@ -12,7 +12,7 @@ export function DatosEnvio() {
     const [peso, setPeso] = useState(0.1);
 
     // Definición de useStates para envío
-    const [cod_postal, setCodigo_postal] = useState("");
+    const [codigo_postal, setCodigo_postal] = useState("");
     const [tipo_envio, setTipo_de_envio] = useState("");
     const [pagado, setPagado] = useState(false);
     const [recogida_a_domicilio, setRecogida_a_domicilio] = useState(false);
@@ -23,6 +23,7 @@ export function DatosEnvio() {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const [id_paquete, setId_paquete] = useState(0); // Para almacenar el ID del paquete creado
     const [id_remitente, setId_remitente] = useState(location.state?.remitenteId || "");
     const [id_destinatario, setId_destinatario] = useState(location.state?.destinatarioId || "");
 
@@ -30,6 +31,7 @@ export function DatosEnvio() {
         e.preventDefault();
 
         try {
+            // Paso 1: Crear el paquete
             const paqueteRes = await fetch("http://127.0.0.1:5000/paquetes", {
                 method: "POST",
                 headers: {
@@ -37,7 +39,7 @@ export function DatosEnvio() {
                 },
                 body: JSON.stringify({
                     tipo,
-                    peso: parseFloat(peso)
+                    peso: parseFloat(peso) 
                 }),
             });
 
@@ -46,21 +48,23 @@ export function DatosEnvio() {
             }
 
             const paqueteData = await paqueteRes.json();
-            const id_paquete = paqueteData.id_paquete;
+            const nuevoIdPaquete = paqueteData.id_paquete; // Obtener el ID del paquete creado
+            setId_paquete(nuevoIdPaquete); // Actualizar el estado con el ID del paquete
 
+            // Paso 2: Crear el envío (usando el ID del paquete creado)
             const envioRes = await fetch("http://127.0.0.1:5000/envios", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    cod_postal,
+                    codigo_postal,
                     tipo_envio,
                     pagado,
                     recogida_a_domicilio,
                     reparto_a_domicilio,
                     por_pagar,
-                    id_paquete,
+                    id_paquete: nuevoIdPaquete, 
                     id_remitente,
                     id_destinatario,
                 }),
@@ -69,8 +73,7 @@ export function DatosEnvio() {
             if (!envioRes.ok) {
                 throw new Error("Error al crear el envío");
             }
-
-            navigate('/');
+            navigate('/'); 
         } catch (error) {
             setMensajeError(error.message);
         }
@@ -81,12 +84,13 @@ export function DatosEnvio() {
                 {JSON.stringify({
                     tipo,
                     peso: parseFloat(peso),
-                    cod_postal,
+                    cod_postal: codigo_postal,
                     tipo_envio,
                     pagado,
                     recogida_a_domicilio,
                     reparto_a_domicilio,
                     por_pagar,
+                    id_paquete,
                     id_remitente,
                     id_destinatario
                 }, null, 2)}
@@ -97,7 +101,7 @@ export function DatosEnvio() {
                 <input
                     className="controls"
                     type="text"
-                    value={cod_postal}
+                    value={codigo_postal}
                     placeholder="Ingrese codigo postal"
                     onChange={(e) => setCodigo_postal(e.target.value)}
                     required
@@ -114,9 +118,9 @@ export function DatosEnvio() {
                     <option disabled value="">
                         Selecciona una opción
                     </option>
-                    <option value="Entrega en el dia">Entrega en el día</option>
-                    <option value="Entrega rapida">Entrega rápida</option>
-                    <option value="Entrega normal">Entrega normal</option>
+                    <option value="entrega en el día">Entrega en el día</option>
+                    <option value="entrega rápida">Entrega rápida</option>
+                    <option value="entrega normal">Entrega normal</option>
                 </select>
                 <label className="info_campo" htmlFor="tipo_paquete">
                     Tipo de paquete
