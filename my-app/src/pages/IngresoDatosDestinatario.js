@@ -6,7 +6,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { BotonError } from "../components/BotonError";
 
 export function IngresoDatosDestinatario() {
-    const [destinatario, setDestinatario] = useState("");
+    const [nombreDestinatario, setnombreDestinatario] = useState("");
+    const [apellidoPaternoDestinatario, setapellidoPaternoDestinatario] = useState("");
+    const [apellidoMaternoDestinatario, setapellidoMaternoDestinatario] = useState("");
     const [rutDestinatario, setRutDestinatario] = useState("");
     const [fono, setFono] = useState("");
     const [direccion, setDireccion] = useState("");
@@ -124,16 +126,38 @@ export function IngresoDatosDestinatario() {
     return (
         <form className="form-register" id="div_envio" onSubmit={handleSubmit}>
             <h4>Datos del destinatario</h4>
-            <label className="info_campo" htmlFor="nombre_destinatario">Nombre destinatario</label>
-            <input
-                className="controls"
-                type="text"
-                value={destinatario}
-                placeholder="Ingrese nombre del destinatario"
-                onChange={(e) => setDestinatario(e.target.value)}
-                id="nombre_destinatario"
-                required
-            />
+            <label className="info_campo" htmlFor="nombre">Nombre</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={nombreDestinatario}
+                    placeholder="Ingrese su nombre"
+                    onChange={(e) => setRemitente(e.target.value)}
+                    id="nombre"
+                    required
+                />
+
+                <label className="info_campo" htmlFor="Apellido paterno">Apellido paterno</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={apellidoPaternoDestinatario}
+                    placeholder="Ingrese su apellido paterno"
+                    onChange={(e) => setRemitente(e.target.value)}
+                    id="Apellido paterno"
+                    required
+                />
+                <label className="info_campo" htmlFor="Apellido materno">Apellido materno</label>
+                <input
+                    className="controls"
+                    type="text"
+                    value={apellidoMaternoDestinatario}
+                    placeholder="Ingrese su Apellido materno"
+                    onChange={(e) => setRemitente(e.target.value)}
+                    id="Apellido materno"
+                    required
+                />
+
             <label className="info_campo" htmlFor="rut_destinatario">R.U.T</label>
             <input
                 className="controls"

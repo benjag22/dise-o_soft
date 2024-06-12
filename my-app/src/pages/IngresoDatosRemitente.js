@@ -14,7 +14,6 @@ export function IngresoDatosRemitente() {
 
 
     const [correo, setEmail] = useState("");
-    const [recogida_a_domicilio, setRecogidaADomicilio] = useState(false);
     const [direccion_remitente, setDireccion_recogida] = useState("");
     const [remitenteId, setRemitenteId] = useState(null);
     const [mensajeError, setMensajeError] = useState("");
@@ -157,12 +156,12 @@ export function IngresoDatosRemitente() {
                     className="controls"
                     type="text"
                     value={apellidoPaternoRemitente}
-                    placeholder="Ingrese su Apellido paterno"
+                    placeholder="Ingrese su apellido paterno"
                     onChange={(e) => setRemitente(e.target.value)}
                     id="Apellido paterno"
                     required
                 />
-                <label className="info_campo" htmlFor="Apellido materno">Apellido materno</label>
+                <label className="info_campo" htmlFor="apellido materno">Apellido materno</label>
                 <input
                     className="controls"
                     type="text"
@@ -185,17 +184,6 @@ export function IngresoDatosRemitente() {
                 <label className="info_campo" htmlFor="direccionRecogida">
                     Recogida a domicilio
                 </label>
-                <select
-                    className="controls"
-                    value={recogida_a_domicilio}
-                    onChange={(e) => setRecogidaADomicilio(e.target.value === "true")}
-                >
-                    <option disabled value="">
-                        Seleccione una opción
-                    </option>
-                    <option value="true">Sí</option>
-                    <option value="false">No</option>
-                </select>
                 <label className="info_campo">Ingrese su dirección</label>
                 <input
                     className="controls"
