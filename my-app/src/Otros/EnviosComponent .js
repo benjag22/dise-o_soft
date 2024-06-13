@@ -22,12 +22,18 @@ const EnviosComponent = () => {
   }
 
   return (
-    <div className="envios-container">
+    <div className="Eenvios-container">
+      <br>
+      </br>
+      <br>
+      </br>
+      <br>
+      </br>
       <h1>Envíos por pagar</h1>
-      <ul className="lista-envio">
+      <ul className="Elista-envio">
         {envios.map((envio) => (
-          <li key={envio.id_envio} className="envio-item"> 
-            <div className="envio-info">
+          <li key={envio.id_envio} className="Eenvio-item"> 
+            <div className="Eenvio-info">
               <p><strong>Número de Envío:</strong> {envio.id_envio}</p> 
               <p><strong>Nombre del Remitente:</strong> {envio.remitente.nombre}</p>
               <p><strong>Correo del Remitente:</strong> {envio.remitente.correo}</p>
@@ -35,8 +41,8 @@ const EnviosComponent = () => {
               <p><strong>Correo del Destinatario:</strong> {envio.destinatario.correo}</p>
               <p><strong>Destino:</strong> {envio.destinatario.direccion}</p>
             </div>
-            <div className="detalles-envio">
-              <button className="detalles-button" onClick={() => handleDetailClick(envio.id_envio)}>
+            <div className="Edetalles-envio">
+              <button className="Edetalles-button" onClick={() => handleDetailClick(envio.id_envio)}>
                 Detalles
               </button>
             </div>
