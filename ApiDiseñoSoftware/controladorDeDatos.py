@@ -1,4 +1,4 @@
-from flask import jsonify, request, render_template
+from flask import jsonify, request
 from datetime import datetime
 import validadorDeDatos as vdd
 from database import db, app
@@ -149,11 +149,6 @@ def buscar_destinatario():
     rut = request.args.get('rut')
     direccion = request.args.get('direccion')
     telefono = request.args.get('telefono')
-    
-    # Validar datos faltantes
-    errores = vde.destinatario_error_buscar(rut, direccion, telefono, None)
-    if errores:
-        return jsonify({'message': 'Error en la búsqueda de destinatario', 'errores': errores}), 400
 
     # Consultar destinatario
     destinatario = vdd.Destinatario.query.filter(
@@ -182,7 +177,7 @@ def buscar_paquete():
     peso = request.args.get('peso')
 
     # Verificar errores de validación inicial
-    errores_validacion = vde.buscar_paquete_error_get(tipo, peso, None)
+    errores_validacion = vde.buscar_paquete_error_get(tipo, peso)
     if errores_validacion:
         return jsonify({'message': 'Datos inválidos', 'errores': errores_validacion}), 400
 
@@ -287,9 +282,6 @@ def create_envio():
 def get_envio_by_id(envio_id):
     try:
         envio = vdd.Envio.query.get(envio_id)
-        errores = vde.envio_error_get(envio)
-        if errores:
-            return jsonify({'message': 'Error al obtener el envío', 'errores': errores}), 404
 
         paquete = vdd.Paquete.query.get(envio.id_paquete)
         remitente = vdd.Remitente.query.get(envio.id_remitente)
@@ -331,15 +323,13 @@ def get_envio_by_id(envio_id):
         }
         return jsonify(resultado)
     except Exception as e:
+        print(str(e))
         return jsonify({'error': str(e)}), 500
 
 @app.route('/envios/por_pagar', methods=['GET'])
 def get_envios_por_pagar():
     try:
         envios_por_pagar = vdd.Envio.query.filter_by(por_pagar=True).all()
-        errores = vde.envios_por_pagar_error_get(envios_por_pagar)
-        if errores:
-            return jsonify({'message': 'Error al obtener envíos por pagar', 'errores': errores}), 404
 
         resultados = []
         for envio in envios_por_pagar:
@@ -384,4 +374,5 @@ def get_envios_por_pagar():
 
         return jsonify(resultados)
     except Exception as e:
+        print(str(e))
         return jsonify({'error': str(e)}), 500
