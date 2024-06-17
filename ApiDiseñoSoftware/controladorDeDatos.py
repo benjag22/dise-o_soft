@@ -442,15 +442,30 @@ def get_envios_por_pagar():
 def crear_historial():
     data = request.get_json()
     try:
-        # Obtener todos los historiales existentes para el id_envio
-        historiales = vdd.Historial.query.filter_by(id_envio=data['id_envio']).all()
-        
-        # Verificar si ya hay un estado "entregado"
-        for historial in historiales:
-            if "entregado" in historial.estado:
-                return jsonify({"error": "El envío ya fue entregado"}), 400
-        
-                
+        # Obtener todos los historiales existentes para el id_envio ordenados por fecha
+        historiales = vdd.Historial.query.filter_by(id_envio=data['id_envio']).order_by(vdd.Historial.fecha_mod).all()
+
+        # Definir la secuencia de estados permitidos
+        estadosEnvio = [
+            "en preparación",
+            "en tránsito",
+            "en sucursal",
+            "en reparto",
+            "entregado"
+        ]
+
+        # Obtener el último estado registrado (si existe)
+        ultimo_estado = historiales[-1].estado if historiales else None
+
+        # Verificar si el nuevo estado es transitivo y no repetido
+        if ultimo_estado:
+            indice_ultimo_estado = estadosEnvio.index(ultimo_estado)
+            indice_nuevo_estado = estadosEnvio.index(data['estado'])
+            
+            if indice_nuevo_estado <= indice_ultimo_estado:
+                return jsonify({"error": "Transición de estado inválida"}), 400
+
+        # Crear el nuevo historial
         fecha_mod = datetime.strptime(data['fecha_mod'], '%Y-%m-%dT%H:%M:%S.%fZ')
         nuevo_historial = vdd.Historial(
             fecha_mod=fecha_mod,
@@ -460,9 +475,11 @@ def crear_historial():
         db.session.add(nuevo_historial)
         db.session.commit()
         return jsonify({"mensaje": "Historial creado con éxito"}), 201
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
+
 
 
 @app.route("/historial/<int:id_envio>", methods=["GET"])
