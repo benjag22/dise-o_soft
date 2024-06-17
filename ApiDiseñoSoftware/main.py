@@ -23,7 +23,5 @@ def main():
     print("Nuevo estado del Envío:", envio.get_estado())
     envio.mostrar_historial()
 
-    parametros = Parametros(5000, 3000, 0.19, 1000, 2000)
-
 if __name__ == "__main__":
     main()

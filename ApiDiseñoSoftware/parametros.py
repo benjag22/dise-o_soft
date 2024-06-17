@@ -1,22 +1,17 @@
 class Parametros:
-    def __init__(self, precio_encomienda, precio_sobre, IVA, precio_por_kg, monto_recogida_domicilio):
-        self.precio_encomienda = precio_encomienda
-        self.precio_sobre = precio_sobre
-        self.IVA = IVA
-        self.precio_por_kg = precio_por_kg
-        self.monto_recogida_domicilio = monto_recogida_domicilio
-
-    def get_precio_encomienda(self):
-        return self.precio_encomienda
-
-    def get_precio_sobre(self):
-        return self.precio_sobre
-
-    def get_IVA(self):
-        return self.IVA
-
-    def get_precio_por_kg(self):
-        return self.precio_por_kg
-
-    def get_monto_recogida_domicilio(self):
-        return self.monto_recogida_domicilio
+    def __init__(self, tarifa_dia, tarifa_rapida, tarifa_normal, entrega_domicilio, recogida_domicilio,IVA):
+        self.tarifas = {
+            'sobre': {
+                'entrega en el día': tarifa_dia,
+                'entrega rápida': tarifa_rapida,
+                'entrega normal': tarifa_normal
+            },
+            'encomienda': {
+                'entrega en el día': tarifa_dia,  # $/kg
+                'entrega rápida': tarifa_rapida,  # $/kg
+                'entrega normal': tarifa_normal   # $/kg
+            }
+        }
+        self.entrega_domicilio = entrega_domicilio
+        self.recogida_domicilio = recogida_domicilio
+        self.iva=IVA

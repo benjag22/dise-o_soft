@@ -57,7 +57,7 @@ class Envio(db.Model):
     tipo_envio = db.Column(db.String(20), nullable=False)
     codigo_postal = db.Column(db.String(10), nullable=False)
     fecha_recepcion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    reparto_a_domicilio = db.Column(db.DateTime, nullable=True)
+    reparto_a_domicilio = db.Column(db.Boolean, nullable=True)
     pagado = db.Column(db.Boolean, nullable=False)
     id_paquete = db.Column(db.Integer, db.ForeignKey('Paquete.id'), nullable=False)
     id_destinatario = db.Column(db.Integer, db.ForeignKey('Destinatario.id'), nullable=False)
