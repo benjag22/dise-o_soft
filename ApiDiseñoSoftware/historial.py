@@ -1,10 +1,14 @@
+from datetime import datetime
+
 class Historial:
-    def __init__(self, envio, fecha_mod):
-        self.envio = envio
+    def __init__(self, id_envio, fecha_mod, estado):
+        self.id_envio = id_envio
         self.fecha_mod = fecha_mod
+        self.estado = estado
 
-    def get_envio(self):
-        return self.envio
-
-    def get_fecha_mod(self):
-        return self.fecha_mod
+    def to_dict(self):
+        return {
+            "id_envio": self.id_envio,
+            "fecha_mod": self.fecha_mod.strftime('%Y-%m-%d %H:%M:%S'),
+            "estado": self.estado
+        }

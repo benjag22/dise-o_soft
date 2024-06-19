@@ -5,6 +5,8 @@ from database import db, app
 import ventanaDeErrores as vde
 from parametros import Parametros
 from decimal import Decimal
+from historial import Historial
+from envio import Envio
 
 @app.route("/clientes", methods=["POST"])
 def create_cliente():
@@ -485,21 +487,33 @@ def crear_historial():
 @app.route("/historial/<int:id_envio>", methods=["GET"])
 def obtener_historial(id_envio):
     try:
-        historiales = vdd.Historial.query.filter_by(id_envio=id_envio).all()
-        if not historiales:
+        envio = vdd.Envio.query.get(id_envio)
+        if not envio:
             return jsonify({"mensaje": "No se encontraron historiales para el id_envio proporcionado"}), 404
-        
-        result = [
-            {
-                "id": h.id,
-                "fecha_mod": h.fecha_mod.strftime('%Y-%m-%d %H:%M:%S'),
-                "estado": h.estado,
-                "id_envio": h.id_envio
-            }
-            for h in historiales
-        ]
-        return jsonify(result), 200
+
+        envio_obj = Envio(
+            envio.id,
+            envio.codigo_postal,
+            envio.tipo_envio,
+            envio.pagado,
+            envio.recogida_a_domicilio,
+            envio.reparto_a_domicilio,
+            envio.por_pagar,
+            envio.paquete,
+            envio.remitente,
+            envio.destinatario,
+            envio.estado
+        )
+        print(envio_obj.getId)
+        historiales = vdd.Historial.query.filter_by(id_envio=id_envio).all()
+        for hist in historiales:
+            envio_obj.historial.append(Historial(hist.id_envio, hist.fecha_mod, hist.estado))
+
+        result = envio_obj.mostrar_historial()
+        return result, 200
     except Exception as e:
+        print(str(e))
+        print(envio_obj.getId)
         return jsonify({"error": str(e)}), 400
 
 @app.route('/calcular_precio/<int:id_envio>', methods=['GET'])
@@ -507,13 +521,12 @@ def calcular_precio(id_envio):
     try:
         TARIFAS = Parametros(10000, 7000, 5000, 1500, 2000, Decimal('0.19'))
         envio = vdd.Envio.query.get(id_envio)
-        listaPrecios = {}
-
+        
         if not envio:
             return jsonify({"error": "Envío no encontrado"}), 404
-        
+
         paquete = vdd.Paquete.query.get(envio.id_paquete)
-        
+
         if not paquete:
             return jsonify({"error": "Paquete no encontrado"}), 404
 
@@ -523,33 +536,14 @@ def calcular_precio(id_envio):
         recogida_a_domicilio = envio.recogida_a_domicilio
         reparto_a_domicilio = envio.reparto_a_domicilio
 
-        precio = Decimal('0')
-
-        # Calcular tarifa base según el tipo de envío y tipo de paquete
-        if tipo_paquete == 'sobre':
-            precio += Decimal(TARIFAS.tarifas['sobre'][tipo_envio])
-            listaPrecios['precio_por_tipo_de_envio'] = TARIFAS.tarifas['sobre'][tipo_envio]
-        elif tipo_paquete == 'encomienda' and peso_paquete:
-            precio += Decimal(TARIFAS.tarifas['encomienda'][tipo_envio]) * peso_paquete
-            listaPrecios['precio_por_tipo_de_envio'] = TARIFAS.tarifas['encomienda'][tipo_envio] * peso_paquete
-        else:
-            return jsonify({"error": "Información del envío incompleta"}), 400
-
-        # Agregar costo de entrega a domicilio si aplica
-        if reparto_a_domicilio:
-            precio += Decimal(TARIFAS.entrega_domicilio)
-            listaPrecios['precio_por_reparto_a_domicilio'] = TARIFAS.entrega_domicilio
-
-        # Agregar costo de recogida a domicilio si aplica
-        if recogida_a_domicilio:
-            precio += Decimal(TARIFAS.recogida_domicilio)
-            listaPrecios['precio_por_recogida_a_domicilio'] = TARIFAS.recogida_domicilio
-        
-        # Calcular total incluyendo IVA
-        total_con_iva = precio * (Decimal('1') + TARIFAS.iva)
-        listaPrecios['total_con_IVA'] = total_con_iva
+        listaPrecios = TARIFAS.calcular_tarifa_envio(tipo_paquete, tipo_envio, peso_paquete, recogida_a_domicilio, reparto_a_domicilio)
 
         return jsonify({"precios_detallados": listaPrecios}), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
     
     except Exception as e:
         return jsonify({"error": str(e)}), 400
