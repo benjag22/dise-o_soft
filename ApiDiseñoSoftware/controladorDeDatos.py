@@ -7,6 +7,11 @@ from parametros import Parametros
 from decimal import Decimal
 from historial import Historial
 from envio import Envio
+from destinatario import Destinatario
+from remitente import Remitente
+from paquete import Paquete
+
+TARIFAS = Parametros(10000, 7000, 5000, 1500, 2000, Decimal('0.19'))
 
 @app.route("/clientes", methods=["POST"])
 def create_cliente():
@@ -521,22 +526,31 @@ def calcular_precio(id_envio):
     try:
         TARIFAS = Parametros(10000, 7000, 5000, 1500, 2000, Decimal('0.19'))
         envio = vdd.Envio.query.get(id_envio)
+        destinatario = vdd.Destinatario.query.get(envio.id_destinatario)
+        remitente = vdd.Remitente.query.get(envio.id_remitente)
+
+        if not destinatario or not remitente:
+            return jsonify({"error": "destinatario o remitente no encontrado"}), 404
+        
+        nombre_destinatario = vdd.Cliente.query.get(destinatario.rut_destinatario).nombre
+        nombre_remitente = vdd.Cliente.query.get(remitente.rut_remitente).nombre
+
+        destinatario_obj = Destinatario(destinatario.rut_destinatario, nombre_destinatario, destinatario.direccion, destinatario.telefono)
+        remitente_obj = Remitente(remitente.rut_remitente, nombre_remitente, remitente.direccion, remitente.correo)
         
         if not envio:
             return jsonify({"error": "Envío no encontrado"}), 404
 
         paquete = vdd.Paquete.query.get(envio.id_paquete)
+        paquete.obj = Paquete(paquete.tipo,paquete.peso)
 
         if not paquete:
             return jsonify({"error": "Paquete no encontrado"}), 404
+        
+        envio_obj=Envio(envio.id, envio.codigo_postal, envio.tipo_envio, envio.pagado, envio.recogida_a_domicilio, envio.reparto_a_domicilio, paquete.obj,remitente_obj,destinatario_obj)
 
-        tipo_envio = envio.tipo_envio
-        tipo_paquete = paquete.tipo
-        peso_paquete = paquete.peso
-        recogida_a_domicilio = envio.recogida_a_domicilio
-        reparto_a_domicilio = envio.reparto_a_domicilio
 
-        listaPrecios = TARIFAS.calcular_tarifa_envio(tipo_paquete, tipo_envio, peso_paquete, recogida_a_domicilio, reparto_a_domicilio)
+        listaPrecios = envio_obj.calcular_valor_encomienda(TARIFAS)
 
         return jsonify({"precios_detallados": listaPrecios}), 200
 
