@@ -6,15 +6,15 @@ from paquete import Paquete
 from destinatario import Destinatario
 from remitente import Remitente
 from pago import Pago
+from cliente import Cliente
 
 class Envio:
     estados_posibles = ["en preparación", "en tránsito", "en sucursal", "en reparto", "entregado"]
 
-    def __init__(self, id_envio, cod_postal, tipo_envio, pagado, recogida_a_domicilio, reparto_a_domicilio, paquete, remitente, destinatario):
+    def __init__(self, id_envio, cod_postal, tipo_envio, recogida_a_domicilio, reparto_a_domicilio, paquete, remitente, destinatario):
         self.id_envio = id_envio
         self.cod_postal = cod_postal
         self.tipo_envio = tipo_envio
-        self.pagado = pagado
         self.recogida_a_domicilio = recogida_a_domicilio
         self.reparto_a_domicilio = reparto_a_domicilio
         self.paquete = Paquete(paquete.tipo, paquete.peso)
@@ -22,6 +22,7 @@ class Envio:
         self.destinatario = Destinatario(destinatario.rut, destinatario.nombre, destinatario.direccion, destinatario.telefono)
         self.fecha_recepcion = datetime.utcnow()
         self.historial = []
+        self.pagos = []
 
     def getId(self):
         return self.id_envio
@@ -30,9 +31,6 @@ class Envio:
 
     def get_tipo_envio(self):
         return self.tipo_envio
-
-    def get_pagado(self):
-        return self.pagado
 
     def get_recogida_a_domicilio(self):
         return self.recogida_a_domicilio
@@ -84,7 +82,7 @@ class Envio:
         return self.historial[-1]
     
 
-    def calcular_valor_encomienda(self, parametros):
+    def valor_por_envio(self, parametros, cliente: Cliente, pagado):
         precio = Decimal('0')
         lista_precios = {}
 
@@ -115,6 +113,9 @@ class Envio:
         # Calcular total incluyendo IVA
         total_con_iva = precio * (Decimal('1') + parametros.IVA())
         lista_precios['total_con_IVA'] = total_con_iva
+
+        pago = Pago(pagado, total_con_iva, cliente)
+        self.pagos.append(pago)
 
         return lista_precios
     
