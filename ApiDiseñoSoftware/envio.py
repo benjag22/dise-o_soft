@@ -11,7 +11,7 @@ from cliente import Cliente
 class Envio:
     estados_posibles = ["en preparación", "en tránsito", "en sucursal", "en reparto", "entregado"]
 
-    def __init__(self, id_envio, cod_postal, tipo_envio, recogida_a_domicilio, reparto_a_domicilio, paquete, remitente, destinatario):
+    def __init__(self, id_envio, cod_postal, tipo_envio, recogida_a_domicilio, reparto_a_domicilio, paquete, remitente, destinatario): 
         self.id_envio = id_envio
         self.cod_postal = cod_postal
         self.tipo_envio = tipo_envio
