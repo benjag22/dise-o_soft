@@ -521,10 +521,9 @@ def obtener_historial(id_envio):
         print(envio_obj.getId)
         return jsonify({"error": str(e)}), 400
 
-@app.route('/calcular_precio/<int:id_envio>', methods=['GET'])
-def calcular_precio(id_envio):
+@app.route('/calcular_pago/<int:id_envio>', methods=['GET'])
+def calcular_pago(id_envio):
     try:
-        TARIFAS = Parametros(10000, 7000, 5000, 1500, 2000, Decimal('0.19'))
         envio = vdd.Envio.query.get(id_envio)
         destinatario = vdd.Destinatario.query.get(envio.id_destinatario)
         remitente = vdd.Remitente.query.get(envio.id_remitente)
@@ -550,7 +549,7 @@ def calcular_precio(id_envio):
         envio_obj=Envio(envio.id, envio.codigo_postal, envio.tipo_envio, envio.pagado, envio.recogida_a_domicilio, envio.reparto_a_domicilio, paquete.obj,remitente_obj,destinatario_obj)
 
 
-        listaPrecios = envio_obj.calcular_valor_encomienda(TARIFAS)
+        listaPrecios = envio_obj.crear_pago(envio_obj.TARIFAS)
 
         return jsonify({"precios_detallados": listaPrecios}), 200
 
@@ -561,3 +560,4 @@ def calcular_precio(id_envio):
     
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    

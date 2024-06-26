@@ -1,18 +1,17 @@
 from cliente import Cliente
-from formaPago import FormaPago
 
 class Pago:
 
-    def __init__(self,formaDePago,valorEnvio,cliente):
-        self.formaDePago = formaDePago
+    def __init__(self,valorEnvio,cliente):
         self.valorEnvio = valorEnvio
         self.cliente: Cliente = cliente
         self.pagado = False
-        if formaDePago == FormaPago.pagado:
-            self.enviar_pago()
+        self.pago_cancelado = False
 
     def enviar_pago(self):
-        #Aqui se lanzaria el pago en Verificacion de pago
+        if self.pago_cancelado:
+            return False
+        #Aqui se lanzaria el pago en Verificacion de pago, simulando la verificacion de pago 
         pagoExitoso = True
         if pagoExitoso:
             self.pagado = True
@@ -20,3 +19,6 @@ class Pago:
     
     def get_pagado(self):
         return self.pagado
+    
+    def setPago_cancelado(self):
+        self.pago_cancelado = True

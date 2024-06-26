@@ -8,9 +8,5 @@ class Historial:
         self.fecha_mod = fecha_mod
         self.estado = estado
 
-    def to_dict(self):
-        return {
-            "id_envio": self.id_envio,
-            "fecha_mod": self.fecha_mod.strftime('%Y-%m-%d %H:%M:%S'),
-            "estado": self.estado
-        }
+    def getEstado(self):
+        return self.estado

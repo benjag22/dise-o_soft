@@ -9,7 +9,8 @@ from pago import Pago
 from cliente import Cliente
 
 class Envio:
-    estados_posibles = ["en preparación", "en tránsito", "en sucursal", "en reparto", "entregado"]
+    estados_posibles = ["cancelado", "en preparación", "en tránsito", "en sucursal", "en reparto", "entregado"]
+
 
     def __init__(self, id_envio, cod_postal, tipo_envio, recogida_a_domicilio, reparto_a_domicilio, paquete, remitente, destinatario): 
         self.id_envio = id_envio
@@ -22,6 +23,7 @@ class Envio:
         self.destinatario = Destinatario(destinatario.rut, destinatario.nombre, destinatario.direccion, destinatario.telefono)
         self.fecha_recepcion = datetime.utcnow()
         self.historial = []
+        self.pagado=False
 
     def getId(self):
         return self.id_envio
@@ -51,53 +53,50 @@ class Envio:
 
     def get_fecha_recepcion(self):
         return self.fecha_recepcion
-
-
-
-    def siguienteEstado(self, nuevo_estado, fecha_mod):
-        if nuevo_estado not in self.estados_posibles:
-            raise ValueError("Estado no válido.")
-
-        ultimo_estado = self.historial[-1].estado if self.historial else self.estado
-        if self.estados_posibles.index(nuevo_estado) <= self.estados_posibles.index(ultimo_estado):
-            raise ValueError("Transición de estado inválida.")
-
-        self.estado = Historial(self.id_envio, fecha_mod, nuevo_estado)
-        self.historial.append(self.estado)
-        return self.estado
     
     def siguienteEstado(self):
-        if not self.historial:
-            ultimo_estado = self.estados_posibles[0]
-        else:
-            ultimo_estado = self.get_last_historial()
-
-        try:
-            nuevo_estado = self.estados_posibles[self.estados_posibles.index(ultimo_estado) + 1]
-        except IndexError:
-            raise ValueError("No hay estados siguientes disponibles. El envío ya está en el estado final.")
+        ultimo_estado = self.get_last_historial()
+        if ultimo_estado.getEstado() == "cancelado" or ultimo_estado.getEstado() == "entregado":
+            return ultimo_estado
+        
+        nuevo_estado = self.estados_posibles[self.estados_posibles.index(ultimo_estado) + 1]
 
         self.historial.append({"estado": nuevo_estado, "fecha": datetime.utcnow()})
         return self.historial[-1]
     
+        
+    def cancelar_envio(self):
+        estado_cancelado = Historial("cancelado",datetime.utcnow())
+        self.historial.append(estado_cancelado)
+        self.pago.setPago_cancelado()
 
-    def valor_por_envio(self, parametros, cliente: Cliente, pagado):
+
+
+    def get_last_historial(self):
+        if not self.historial:
+            return "en preparación"  
+        return self.historial[-1]
+
+
+    def crear_pago(self, parametros, cliente: Cliente):
         precio = Decimal('0')
         lista_precios = {}
 
-        tipo_paquete = self.paquete['tipo']
+        tipo_paquete = self.paquete.get_tipo()
         tipo_envio = self.tipo_envio
-        peso_paquete = self.paquete.get('peso', 0)
+        peso_paquete = self.paquete.get_peso()
 
         # Calcular tarifa base según el tipo de envío y tipo de paquete
-        if tipo_paquete == 'sobre':
-            precio += parametros.precioPaquete(tipo_paquete, tipo_envio)
-            lista_precios['precio_por_tipo_de_envio'] = parametros.get_tarifa(tipo_paquete, tipo_envio)
-        elif tipo_paquete == 'encomienda' and peso_paquete:
-            precio += parametros.precioPaquete(tipo_paquete, tipo_envio) * Decimal(peso_paquete)
-            lista_precios['precio_por_tipo_de_envio'] = parametros.get_tarifa(tipo_paquete, tipo_envio) * Decimal(peso_paquete)
-        else:
-            raise ValueError("Información del envío incompleta o incorrecta")
+
+        tarifa = parametros.get_tarifa(tipo_paquete, tipo_envio)
+        precio_paquete = parametros.precioPaquete(tipo_paquete, tipo_envio)
+
+        if tipo_paquete == 'encomienda':    
+            precio_paquete *= Decimal(peso_paquete)
+            tarifa *= Decimal(peso_paquete)
+
+        precio += precio_paquete
+        lista_precios['precio_por_tipo_de_envio'] = tarifa
 
         # Agregar costo de entrega a domicilio si aplica
         if self.reparto_a_domicilio:
@@ -113,17 +112,9 @@ class Envio:
         total_con_iva = precio * (Decimal('1') + parametros.IVA())
         lista_precios['total_con_IVA'] = total_con_iva
 
-        self.pago = Pago(pagado, total_con_iva, cliente)
+        self.pago = Pago(total_con_iva, cliente)
 
         return lista_precios
-    
-    
-    def mostrar_historial(self):
-        return [hist.to_dict() for hist in self.historial]
-    
-    def get_last_historial(self):
-        if not self.historial:
-            return None  
-        return self.historial[-1]
+
 
     
