@@ -22,7 +22,6 @@ class Envio:
         self.destinatario = Destinatario(destinatario.rut, destinatario.nombre, destinatario.direccion, destinatario.telefono)
         self.fecha_recepcion = datetime.utcnow()
         self.historial = []
-        self.pago = Pago()
 
     def getId(self):
         return self.id_envio
