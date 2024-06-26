@@ -22,7 +22,7 @@ class Envio:
         self.destinatario = Destinatario(destinatario.rut, destinatario.nombre, destinatario.direccion, destinatario.telefono)
         self.fecha_recepcion = datetime.utcnow()
         self.historial = []
-        self.pagos = []
+        self.pago = Pago()
 
     def getId(self):
         return self.id_envio
@@ -114,8 +114,7 @@ class Envio:
         total_con_iva = precio * (Decimal('1') + parametros.IVA())
         lista_precios['total_con_IVA'] = total_con_iva
 
-        pago = Pago(pagado, total_con_iva, cliente)
-        self.pagos.append(pago)
+        self.pago = Pago(pagado, total_con_iva, cliente)
 
         return lista_precios
     
