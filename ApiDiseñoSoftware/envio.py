@@ -87,16 +87,15 @@ class Envio:
         peso_paquete = self.paquete.get_peso()
 
         # Calcular tarifa base según el tipo de envío y tipo de paquete
+        tarifa = parametros.precioPaquete(tipo_paquete, tipo_envio)
+        precio_paquete = tarifa
 
-        tarifa = parametros.get_tarifa(tipo_paquete, tipo_envio)
-        precio_paquete = parametros.precioPaquete(tipo_paquete, tipo_envio)
-
-        if tipo_paquete == 'encomienda':    
+        if tipo_paquete == 'encomienda':
             precio_paquete *= Decimal(peso_paquete)
             tarifa *= Decimal(peso_paquete)
 
         precio += precio_paquete
-        lista_precios['precio_por_tipo_de_envio'] = tarifa
+        lista_precios['precio_por_tipo_de_envio'] = precio_paquete
 
         # Agregar costo de entrega a domicilio si aplica
         if self.reparto_a_domicilio:

@@ -22,3 +22,4 @@ class Pago:
     
     def setPago_cancelado(self):
         self.pago_cancelado = True
+
